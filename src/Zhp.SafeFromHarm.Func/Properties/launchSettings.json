@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Zhp.SafeFromHarm.Func": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7292",
+      "launchBrowser": false
+    }
+  }
+}
