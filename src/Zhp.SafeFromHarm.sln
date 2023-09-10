@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zhp.SafeFromHarm.Func", "Zhp.SafeFromHarm.Func\Zhp.SafeFromHarm.Func.csproj", "{755C45AD-8BF7-4218-A797-92A465C95DE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zhp.SafeFromHarm.Func", "Zhp.SafeFromHarm.Func\Zhp.SafeFromHarm.Func.csproj", "{755C45AD-8BF7-4218-A797-92A465C95DE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zhp.SafeFromHarm.Tests", "Zhp.SafeFromHarm.Tests\Zhp.SafeFromHarm.Tests.csproj", "{C0795494-2F94-4BF1-845E-F62089938F20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zhp.SafeFromHarm.Tests", "Zhp.SafeFromHarm.Tests\Zhp.SafeFromHarm.Tests.csproj", "{C0795494-2F94-4BF1-845E-F62089938F20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zhp.SafeFromHarm.Domain", "Zhp.SafeFromHarm.Domain\Zhp.SafeFromHarm.Domain.csproj", "{1F663339-C541-4A8D-B12F-1E9DB0D5B721}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C0795494-2F94-4BF1-845E-F62089938F20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0795494-2F94-4BF1-845E-F62089938F20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0795494-2F94-4BF1-845E-F62089938F20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F663339-C541-4A8D-B12F-1E9DB0D5B721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F663339-C541-4A8D-B12F-1E9DB0D5B721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F663339-C541-4A8D-B12F-1E9DB0D5B721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F663339-C541-4A8D-B12F-1E9DB0D5B721}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,246 @@
+[
+  {
+    "id": 4715,
+    "fullname": "Jan Kowalski",
+    "email": "jan.kowalski@zhp.example.com",
+    "firstaccess": 1531927669,
+    "lastaccess": 1693497566,
+    "lastcourseaccess": 1693497566,
+    "description": "",
+    "descriptionformat": 1,
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/pluginfile.php\/121\/user\/icon\/boost\/f2?rev=49713",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/pluginfile.php\/121\/user\/icon\/boost\/f1?rev=49713",
+    "customfields": [
+      {
+        "type": "text",
+        "value": "AA01",
+        "name": "Numer Ewidencyjny",
+        "shortname": "numer_ewidencyjny"
+      },
+      {
+        "type": "menu",
+        "value": "Główna Kwatera ZHP",
+        "name": "Chorągiew",
+        "shortname": "choragiew"
+      },
+      {
+        "type": "menu",
+        "value": "Inne",
+        "name": "Hufiec",
+        "shortname": "hufiec"
+      }
+    ],
+    "roles": [
+      {
+        "roleid": 3,
+        "name": "",
+        "shortname": "editingteacher",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
+  },
+  {
+    "id": 9283,
+    "fullname": "Katarzyna NazwiskoUkryte",
+    "email": "katarzyna.nazwisko@zhp.example.com",
+    "firstaccess": 1458587493,
+    "lastaccess": 1694350413,
+    "lastcourseaccess": 1694350080,
+    "description": "",
+    "descriptionformat": 1,
+    "city": "Warszawa",
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f2?rev=1832",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f1?rev=1832",
+    "customfields": [
+      {
+        "type": "text",
+        "value": "AA02",
+        "name": "Numer Ewidencyjny",
+        "shortname": "numer_ewidencyjny"
+      },
+      {
+        "type": "menu",
+        "value": "Chorągiew Stołeczna",
+        "name": "Chorągiew",
+        "shortname": "choragiew"
+      },
+      {
+        "type": "menu",
+        "value": "Hufiec Warszawa-Praga-Północ",
+        "name": "Hufiec",
+        "shortname": "hufiec"
+      }
+    ],
+    "roles": [
+      {
+        "roleid": 5,
+        "name": "",
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
+  },
+  {
+    "id": 8256,
+    "fullname": "Anna Anonimowa",
+    "email": "anna.anonimowa@zhp.example.com",
+    "firstaccess": 1458587493,
+    "lastaccess": 1694350413,
+    "lastcourseaccess": 1694350080,
+    "description": "",
+    "descriptionformat": 1,
+    "city": "Warszawa",
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f2?rev=1832",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f1?rev=1832",
+    "customfields": [
+      {
+        "type": "text",
+        "value": "AA03",
+        "name": "Numer Ewidencyjny",
+        "shortname": "numer_ewidencyjny"
+      },
+      {
+        "type": "menu",
+        "value": "Chorągiew Stołeczna",
+        "name": "Chorągiew",
+        "shortname": "choragiew"
+      },
+      {
+        "type": "menu",
+        "value": "Hufiec Warszawa-Praga-Północ",
+        "name": "Hufiec",
+        "shortname": "hufiec"
+      }
+    ],
+    "roles": [
+      {
+        "roleid": 5,
+        "name": "",
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
+  },
+  {
+    "id": 8240,
+    "fullname": "Jan Nowak",
+    "email": "anna.anonimowa@zhp.example.com",
+    "firstaccess": 1458587493,
+    "lastaccess": 1694350413,
+    "lastcourseaccess": 1694350080,
+    "description": "",
+    "descriptionformat": 1,
+    "city": "Warszawa",
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f2?rev=1832",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f1?rev=1832",
+    "customfields": [
+      {
+        "type": "text",
+        "value": "AA04",
+        "name": "Numer Ewidencyjny",
+        "shortname": "numer_ewidencyjny"
+      },
+      {
+        "type": "menu",
+        "value": "Chorągiew Stołeczna",
+        "name": "Chorągiew",
+        "shortname": "choragiew"
+      },
+      {
+        "type": "menu",
+        "value": "Hufiec Warszawa-Praga-Północ",
+        "name": "Hufiec",
+        "shortname": "hufiec"
+      }
+    ],
+    "roles": [
+      {
+        "roleid": 5,
+        "name": "",
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
+  },
+  {
+    "id": 1111,
+    "fullname": "Kamil Ślimak",
+    "email": "kamil.slimak@zhp.example.com",
+    "firstaccess": 1458587493,
+    "lastaccess": 1694350413,
+    "lastcourseaccess": 1694350080,
+    "description": "",
+    "descriptionformat": 1,
+    "city": "Warszawa",
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f2?rev=1832",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f1?rev=1832",
+    "customfields": [
+      {
+        "type": "text",
+        "value": "AA04",
+        "name": "Numer Ewidencyjny",
+        "shortname": "numer_ewidencyjny"
+      },
+      {
+        "type": "menu",
+        "value": "Chorągiew Stołeczna",
+        "name": "Chorągiew",
+        "shortname": "choragiew"
+      },
+      {
+        "type": "menu",
+        "value": "Hufiec Warszawa-Praga-Północ",
+        "name": "Hufiec",
+        "shortname": "hufiec"
+      }
+    ],
+    "roles": [
+      {
+        "roleid": 5,
+        "name": "",
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
+  }
+]
