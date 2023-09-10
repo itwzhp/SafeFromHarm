@@ -14,6 +14,8 @@ internal static class MoodleHostBuilderExtensions
                 .Validate(opt => !string.IsNullOrWhiteSpace(opt.MoodleToken));
 
             services.AddSingleton<MoodleClient>();
+
+            services.AddHttpClient<MoodleClient>();
         });
 
         return builder;

@@ -1,4 +1,4 @@
-﻿namespace Zhp.SafeFromHarm.Func.Adapters.Moodle;
+﻿namespace Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 
 internal enum MoodleFunctions
 {

@@ -16,9 +16,9 @@ public class MoodleCertifiedMembersFetcherTests
 
         (await result.ToListAsync()).Should().BeEquivalentTo(new CertifiedMember[]
         {
-            new("jan.kowalski@zhp.example.com", new(2023, 08, 29)),
-            new("katarzyna.nazwisko@zhp.example.com", new(2023, 09, 10)),
-            new("anna.anonimowa@zhp.example.com", new(2023, 09, 02))
+            new("jan.kowalski@zhp.example.com", new(2023, 8, 29)),
+            new("katarzyna.nazwisko@zhp.example.com", new(2023, 9, 8)),
+            new("anna.anonimowa@zhp.example.com", new(2023, 9, 2))
         });
     }
 }

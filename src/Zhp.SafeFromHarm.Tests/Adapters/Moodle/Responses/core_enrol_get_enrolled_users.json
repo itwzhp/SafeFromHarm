@@ -148,7 +148,7 @@
   {
     "id": 8240,
     "fullname": "Jan Nowak",
-    "email": "anna.anonimowa@zhp.example.com",
+    "email": "jan.nowak@zhp.example.com",
     "firstaccess": 1458587493,
     "lastaccess": 1694350413,
     "lastcourseaccess": 1694350080,
@@ -214,6 +214,49 @@
         "name": "Numer Ewidencyjny",
         "shortname": "numer_ewidencyjny"
       },
+      {
+        "type": "menu",
+        "value": "Chorągiew Stołeczna",
+        "name": "Chorągiew",
+        "shortname": "choragiew"
+      },
+      {
+        "type": "menu",
+        "value": "Hufiec Warszawa-Praga-Północ",
+        "name": "Hufiec",
+        "shortname": "hufiec"
+      }
+    ],
+    "roles": [
+      {
+        "roleid": 5,
+        "name": "",
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
+  },
+  {
+    "id": 2222,
+    "fullname": "Tomasz Nullowy",
+    "email": "tomasz.nullowy@zhp.example.com",
+    "firstaccess": 1458587493,
+    "lastaccess": 1694350413,
+    "lastcourseaccess": 1694350080,
+    "description": "",
+    "descriptionformat": 1,
+    "city": "Warszawa",
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f2?rev=1832",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/pluginfile.php\/129\/user\/icon\/boost\/f1?rev=1832",
+    "customfields": [
       {
         "type": "menu",
         "value": "Chorągiew Stołeczna",

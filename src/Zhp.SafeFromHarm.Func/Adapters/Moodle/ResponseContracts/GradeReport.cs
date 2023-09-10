@@ -2,17 +2,17 @@
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
 
-internal record GradeReport([property: JsonPropertyName("usergrades")] UserGrade[] UserGrades);
+internal record GradeReport(UserGrade[] UserGrades);
 
 internal record UserGrade(
-    [property: JsonPropertyName("userid")] int UserId, 
-    [property: JsonPropertyName("gradeitems")] GradeItem[] GradeItems);
+    int UserId, 
+    GradeItem[] GradeItems);
 
 internal record GradeItem(
-    [property: JsonPropertyName("itemtype")] string ItemType,
-    [property: JsonPropertyName("graderaw")] float GradeRaw,
-    [property: JsonPropertyName("gradedategraded")] int GradeDateGraded)
+    string ItemType,
+    float? GradeRaw,
+    long? GradeDateGraded)
 {
     [JsonIgnore]
-    public DateTime GradeDateTime => new();
+    public DateTime? GradeDateTime => GradeDateGraded.HasValue ? DateTimeOffset.FromUnixTimeSeconds(GradeDateGraded.Value).Date : null;
 }
