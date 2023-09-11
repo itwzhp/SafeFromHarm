@@ -1,9 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Reflection;
+using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Ports;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
+using Zhp.SafeFromHarm.Func.Adapters.Smtp;
 using Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 using Zhp.SafeFromHarm.Func.Adapters.Tipi;
 
@@ -12,50 +15,44 @@ var host = new HostBuilder()
     .ConfigureAppConfiguration((ctx, config)
         => config
             .AddJsonFile("appsettings.json", false)
-            .AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", true))
+            .AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", true)
+            .AddUserSecrets(Assembly.GetExecutingAssembly()))
     .ConfigureServices((ctx, services) =>
     {
-        switch(ctx.Configuration["CertifiedMembersFetcher"])
+        _ = ctx.Configuration["CertifiedMembersFetcher"] switch
         {
-            case "Dummy":
-                services.AddSingleton<ICertifiedMembersFetcher, DummyCertifiedMembersFetcher>();
-                break;
-            case "Moodle":
-                services.AddSingleton<ICertifiedMembersFetcher, MoodleCertifiedMembersFetcher>();
-                break;
-            default:
-                throw new Exception($"Unknown CertifiedMembersFetcher config value: {ctx.Configuration["CertifiedMembersFetcher"] ?? "null"}");
-        }
+            "Dummy" => services.AddSingleton<ICertifiedMembersFetcher, DummyCertifiedMembersFetcher>(),
+            "Moodle" => services.AddSingleton<ICertifiedMembersFetcher, MoodleCertifiedMembersFetcher>(),
+            _ => throw new Exception($"Unknown CertifiedMembersFetcher config value: {ctx.Configuration["CertifiedMembersFetcher"] ?? "null"}")
+        };
 
-        switch (ctx.Configuration["EmailMembershipNumberMapper"])
+        _ = ctx.Configuration["EmailMembershipNumberMapper"] switch
         {
-            case "Dummy":
-                services.AddSingleton<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>();
-                break;
-            case "Moodle":
-                services.AddSingleton<IEmailMembershipNumberMapper, MoodleEmailMembershipNumberMapper>();
-                break;
-            case "Ms365":
-                throw new NotImplementedException("Ms365 mail to membership number mapping not yet implemented");
-            default:
-                throw new Exception($"Unknown EmailMembershipNumberMapper config value: {ctx.Configuration["EmailMembershipNumberMapper"] ?? "null"}");
-        }
+            "Dummy" => services.AddSingleton<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>(),
+            "Moodle" => services.AddSingleton<IEmailMembershipNumberMapper, MoodleEmailMembershipNumberMapper>(),
+            "Ms365" => throw new NotImplementedException("Ms365 mail to membership number mapping not yet implemented"),
+            _ => throw new Exception($"Unknown EmailMembershipNumberMapper config value: {ctx.Configuration["EmailMembershipNumberMapper"] ?? "null"}")
+        };
 
-        switch (ctx.Configuration["RequiredMembersFetcher"])
+        _ = ctx.Configuration["RequiredMembersFetcher"] switch
         {
-            case "Dummy":
-                services.AddSingleton<IRequiredMembersFetcher, DummyRequiredMembersFetcher>();
-                break;
-            case "Tipi":
-                services.AddSingleton<IRequiredMembersFetcher, TipiRequiredMembersFetcher>();
-                break;
-            default:
-                throw new Exception($"Unknown RequiredMembersFetcher config value: {ctx.Configuration["RequiredMembersFetcher"] ?? "null"}");
-        }
+            "Dummy" => services.AddSingleton<IRequiredMembersFetcher, DummyRequiredMembersFetcher>(),
+            "Tipi" => services.AddSingleton<IRequiredMembersFetcher, TipiRequiredMembersFetcher>(),
+            _ => throw new Exception($"Unknown RequiredMembersFetcher config value: {ctx.Configuration["RequiredMembersFetcher"] ?? "null"}")
+        };
+
+        _ = ctx.Configuration["NotificationSender"] switch
+        {
+            "Dummy" => services.AddSingleton<INotificationSender, DummyNotificationSender>(),
+            "Smtp" => services.AddSingleton<INotificationSender, SmptNotificationSender>(),
+            _ => throw new Exception($"Unknown NotificationSender config value: {ctx.Configuration["NotificationSender"] ?? "null"}")
+        };
+
+        services.AddOptions<SafeFromHarmOptions>()
+            .BindConfiguration("SafeFromHarm")
+            .Validate(sfh => sfh.CertificateExpiryDays > 0);
     })
     .ConfigureMoodleServices()
     .Build();
-
-//todo check if function class resolves
 
 host.Run();

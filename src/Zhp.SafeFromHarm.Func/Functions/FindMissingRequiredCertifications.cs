@@ -27,7 +27,10 @@ namespace Zhp.SafeFromHarm.Func.Functions
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
-            await response.WriteStringAsync(string.Join("\n", (await certifiedMembersFetcher.GetCertifiedMembers().ToArrayAsync()).AsEnumerable()));
+            var certified = certifiedMembersFetcher.GetCertifiedMembers();
+            var numbers = certified.SelectAwait(async c => (c.EmailAddress, await emailNumberMapper.GetMembershipNumberForEmail(c.EmailAddress)));
+
+            await response.WriteStringAsync(string.Join("\n", (await numbers.ToArrayAsync()).AsEnumerable()));
 
             _logger.LogInformation("Starting Finished.");
 

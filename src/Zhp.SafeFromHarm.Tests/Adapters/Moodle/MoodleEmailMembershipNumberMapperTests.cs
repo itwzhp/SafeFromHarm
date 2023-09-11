@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Zhp.SafeFromHarm.Domain.Ports;
+﻿using Zhp.SafeFromHarm.Domain.Ports;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 
 namespace Zhp.SafeFromHarm.Tests.Adapters.Moodle;
