@@ -285,5 +285,31 @@
         "shortname": "Polityka Bezpieczeństwa"
       }
     ]
+  },
+  {
+    "id": 9289,
+    "fullname": "Barbara BezCustomFieldów",
+    "email": "barbara.bezfield@zhp.example.com",
+    "firstaccess": 1694097108,
+    "lastaccess": 1694097108,
+    "lastcourseaccess": 0,
+    "country": "PL",
+    "profileimageurlsmall": "https:\/\/edu.zhp.pl\/theme\/image.php\/boost\/core\/1675785359\/u\/f2",
+    "profileimageurl": "https:\/\/edu.zhp.pl\/theme\/image.php\/boost\/core\/1675785359\/u\/f1",
+    "roles": [
+      {
+        "roleid": 5,
+        "name": "",
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "enrolledcourses": [
+      {
+        "id": 47,
+        "fullname": "Polityka Bezpieczeństwa Dzieci, Młodzieży i Dorosłych w ZHP",
+        "shortname": "Polityka Bezpieczeństwa"
+      }
+    ]
   }
 ]
