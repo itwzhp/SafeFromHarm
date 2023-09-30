@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Zhp.SafeFromHarm.Domain.Model;
+﻿using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Domain.Ports;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Services;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Smtp;
@@ -51,8 +52,11 @@ var host = new HostBuilder()
         services.AddOptions<SafeFromHarmOptions>()
             .BindConfiguration("SafeFromHarm")
             .Validate(sfh => sfh.CertificateExpiryDays > 0);
+
+        services.AddTransient<MissingCertificationsNotifier>();
     })
     .ConfigureMoodleServices()
+    .ConfigureSmtp()
     .Build();
 
 host.Run();

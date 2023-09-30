@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Domain.Services;
@@ -14,14 +15,14 @@ public class MissingCertificationsNotifier
 
     public MissingCertificationsNotifier(
         ILogger<MissingCertificationsNotifier> logger,
-        SafeFromHarmOptions options,
+        IOptions<SafeFromHarmOptions> options,
         IRequiredMembersFetcher requiredMembersFetcher,
         ICertifiedMembersFetcher certifiedMembersFetcher,
         IEmailMembershipNumberMapper numberMapper,
         INotificationSender sender)
     {
         this.logger = logger;
-        this.options = options;
+        this.options = options.Value;
         this.requiredMembersFetcher = requiredMembersFetcher;
         this.certifiedMembersFetcher = certifiedMembersFetcher;
         this.numberMapper = numberMapper;
@@ -39,7 +40,7 @@ public class MissingCertificationsNotifier
             .SelectAwait(async m => await numberMapper.GetMembershipNumberForEmail(m.EmailAddress))
             .OfType<string>()
             .ToHashSetAsync(StringComparer.OrdinalIgnoreCase, cancellationToken);
-        logger.LogDebug("Found {number} certified members", certifiedMembers.Count);
+        logger.LogInformation("Found {number} certified members", certifiedMembers.Count);
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -56,7 +57,7 @@ public class MissingCertificationsNotifier
 
             var missingCertificationMembers = await notification.ToListAsync(cancellationToken);
             
-            logger.LogDebug("Sending notification to {supervisor} about {count} missing members", notification.Key, missingCertificationMembers.Count);
+            logger.LogInformation("Sending notification to {supervisor} about {count} missing members", notification.Key, missingCertificationMembers.Count);
             await sender.NotifySupervisor(notification.Key, missingCertificationMembers);
         }
     }

@@ -1,40 +1,29 @@
-using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Services;
 
 namespace Zhp.SafeFromHarm.Func.Functions
 {
     public class FindMissingRequiredCertifications
     {
         private readonly ILogger _logger;
-        private readonly ICertifiedMembersFetcher certifiedMembersFetcher;
-        private readonly IEmailMembershipNumberMapper emailNumberMapper;
+        private readonly MissingCertificationsNotifier notifier;
 
-        public FindMissingRequiredCertifications(ILoggerFactory loggerFactory, ICertifiedMembersFetcher certifiedMembersFetcher, IEmailMembershipNumberMapper emailNumberMapper)
+        public FindMissingRequiredCertifications(ILoggerFactory loggerFactory, MissingCertificationsNotifier notifier)
         {
             _logger = loggerFactory.CreateLogger<FindMissingRequiredCertifications>();
-            this.certifiedMembersFetcher = certifiedMembersFetcher;
-            this.emailNumberMapper = emailNumberMapper;
+            this.notifier = notifier;
         }
 
         [Function("FindMissingRequiredCertifications")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        public async Task Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
         {
             _logger.LogInformation("Starting FindMissingRequiredCertifications");
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+            await notifier.SendNotificationsOnMissingCertificates(req.FunctionContext.CancellationToken);
 
-            var certified = certifiedMembersFetcher.GetCertifiedMembers();
-            var numbers = certified.SelectAwait(async c => (c.EmailAddress, await emailNumberMapper.GetMembershipNumberForEmail(c.EmailAddress)));
-
-            await response.WriteStringAsync(string.Join("\n", (await numbers.ToArrayAsync()).AsEnumerable()));
-
-            _logger.LogInformation("Starting Finished.");
-
-            return response;
+            _logger.LogInformation("FindMissingRequiredCertifications Finished.");
         }
     }
 }

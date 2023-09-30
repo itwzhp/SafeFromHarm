@@ -1,3 +1,3 @@
 ﻿namespace Zhp.SafeFromHarm.Domain.Model;
 
-public record ZhpMember(string FirstName, string LastName, string MembershipNumber, string SupervisorEmail);
+public record ZhpMember(string FirstName, string LastName, string MembershipNumber, string SupervisorEmail, string SupervisorUnitName);

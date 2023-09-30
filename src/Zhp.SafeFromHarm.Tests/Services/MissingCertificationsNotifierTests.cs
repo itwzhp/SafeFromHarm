@@ -28,9 +28,9 @@ public class MissingCertificationsNotifierTests
         await subject.SendNotificationsOnMissingCertificates(CancellationToken.None);
 
         senderSubstitute.ReceivedCalls().Single(c => c.GetArguments().First() as string == "hufiec@zhp.example.com").GetArguments().ElementAt(1)
-            .Should().BeEquivalentTo(new ZhpMember[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com"), new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com") });
+            .Should().BeEquivalentTo(new ZhpMember[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"), new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec") });
 
         senderSubstitute.ReceivedCalls().Single(c => c.GetArguments().First() as string == "drugihufiec@zhp.example.com").GetArguments().ElementAt(1)
-            .Should().BeEquivalentTo(new ZhpMember[] { new("Tomasz", "Innyhufiec", "AB01", "drugihufiec@zhp.example.com") });
+            .Should().BeEquivalentTo(new ZhpMember[] { new("Tomasz", "Innyhufiec", "AB01", "drugihufiec@zhp.example.com", "Drugi Hufiec") });
     }
 }
