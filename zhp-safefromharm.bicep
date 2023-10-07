@@ -132,7 +132,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: 'Tipi'
         }
         {
-          name: 'EmailMembershipNumberMapper'
+          name: 'NotificationSender'
           value: 'Dummy' //change to Smtp to enable mails
         }
       ]
