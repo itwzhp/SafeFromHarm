@@ -50,7 +50,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: success() && github.ref == 'refs/heads/master' && failure()
+    if: success() && github.ref == 'refs/heads/master'
     needs: build
     steps:
     - name: Download package
@@ -70,7 +70,7 @@ jobs:
         subscriptionId: 35e22786-93ea-47c8-902a-16e9d0f03e17
         resourceGroupName: zhp-safefromharm
         template: ./zhp-safefromharm.bicep
-        parameters: #todo
+        parameters: tipiTokenId=${{ secrets.TIPI_TOKEN_ID }} tipiTokenSecret=${{ secrets.TIPI_TOKEN_SECRET }} moodleToken=${{ secrets.MOODLE_TOKEN}} smtpHost=abc smtpPort=123 smtpUsername=abc smtpPassword=abc
 
     - name: Upload files
       uses: Azure/functions-action@v1
