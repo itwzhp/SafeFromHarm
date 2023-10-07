@@ -24,7 +24,7 @@ public class TipiRequiredMembersFetcherTests
     }
 
     [Fact]
-    public async Task SomeResults_Exception()
+    public async Task SomeResults_MapsProperly()
     {
         httpHandler.ResponseBody = """
         [
@@ -58,6 +58,29 @@ public class TipiRequiredMembersFetcherTests
             new("Jan", "Kowalski", "AA01", "radomsko@zhp.pl", "Hufiec Radomsko"),
             new("Anna", "Malinowska", "AA02", "cieszyn@zhp.pl", "Hufiec Ziemi Cieszyńskiej"),
         });
+    }
+    
+    [Fact]
+    public async Task DuplicateMail_TakesFirst()
+    {
+        httpHandler.ResponseBody = """
+        [
+            {
+        	    "memberId": "AB123",
+        	    "personId": 111,
+        	    "firstName": "Jan",
+        	    "lastName": "Kowalski",
+        	    "birthdate": -446086800,
+        	    "allocationUnitName": "Chorągiew Dolnośląska",
+        	    "allocationUnitContactEmails": "choragiew@dolnoslaska.zhp.pl;dolnoslaska@zhp.pl",
+        	    "memberRoles": null
+            }
+        ]
+        """;
+
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+
+        result.Should().ContainSingle().Which.Should().Be(new ZhpMember("Jan", "Kowalski", "AB123", "choragiew@dolnoslaska.zhp.pl", "Chorągiew Dolnośląska"));
     }
 
     private class TestHandler : HttpMessageHandler

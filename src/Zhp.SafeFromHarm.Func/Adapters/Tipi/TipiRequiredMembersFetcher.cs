@@ -30,7 +30,7 @@ internal class TipiRequiredMembersFetcher : IRequiredMembersFetcher
                 member.firstName,
                 member.lastName,
                 member.memberId,
-                member.allocationUnitContactEmails,
+                member.allocationUnitContactEmails.Split(';').First(),
                 member.allocationUnitName);
     }
 
