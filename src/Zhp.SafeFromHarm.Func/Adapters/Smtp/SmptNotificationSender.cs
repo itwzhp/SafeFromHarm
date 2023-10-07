@@ -42,7 +42,7 @@ internal class SmptNotificationSender : INotificationSender
         var b = new StringBuilder(
             """
             Czuwaj,
-            Oto lista członków ZHP z przydziałem do Twojej jednostki, którzy nie ukończyli obowiązkowego szkolenia Safe From Harm:
+            Oto lista członków ZHP z przydziałem do Twojej jednostki, którzy nie ukończyli obowiązkowego szkolenia z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych, a tym samym nie posiadają ważnego certyfikatu "Safe From Harm":
 
             """);
 
@@ -53,8 +53,17 @@ internal class SmptNotificationSender : INotificationSender
 
         b.Append(
             """
-            Poproś ich o ukończenie testu na https://edu.zhp.pl/course/view.php?id=47.
-            Jeśli ta informacja jest nieaktualna zaktualizuj Tipi, aby poprawić przydział i funkcje tych członków
+            Poproś ich o ukończenie e-szkolenia i wypełnienie testu na https://edu.zhp.pl/course/view.php?id=47
+            Jeśli ta informacja jest nieaktualna zaktualizuj Tipi, aby poprawić przydział i funkcje tych członków.
+            Informacja o posiadaniu certyfikatu Safe from Harm powinna znaleźć się w Tipi w sekcji "Kursy, szkolenia i uprawnienia".
+            
+            Posiadanie ważnego certyfikatu Safe From Harm, poświadczającego, że osoba ukończyła szkolenie z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych w ZHP jest obowiązkiem:
+            - wszystkich osób pełnoletnich w ZHP - w czasie 3 miesięcy od osiągnięcia pełnoletniości lub wstąpienia do organizacji,
+            - osób niepełnoletnich, pełniących funkcje wychowawcze - w momencie mianowania na funkcję,
+            - osób otwierających próby na stopnie instruktorskie.
+            
+            Wszystkie informacje o Polityce ochrony bezpieczeństwa dzieci, młodzieży i dorosłych w ZHP znajdziesz na stronie internetowej: https://zhp.pl/sfh
+            
             Z harcerskim pozdrowieniem,
             Zespół Safe from Harm
             """);
