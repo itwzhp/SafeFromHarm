@@ -15,7 +15,6 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureAppConfiguration((ctx, config)
         => config
-            .AddJsonFile("appsettings.json", false)
             .AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", true)
             .AddUserSecrets(Assembly.GetExecutingAssembly()))
     .ConfigureServices((ctx, services) =>
@@ -57,6 +56,7 @@ var host = new HostBuilder()
     })
     .ConfigureMoodleServices()
     .ConfigureSmtp()
+    .ConfigureTipi()
     .Build();
 
 host.Run();

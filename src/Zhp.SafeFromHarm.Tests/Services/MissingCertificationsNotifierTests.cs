@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Domain.Ports;
 using Zhp.SafeFromHarm.Domain.Services;
@@ -15,7 +17,7 @@ public class MissingCertificationsNotifierTests
     {
         subject = new(
             Substitute.For<ILogger<MissingCertificationsNotifier>>(),
-            new() { CertificateExpiryDays = 1095 },
+            Options.Create(new SafeFromHarmOptions()),
             new DummyRequiredMembersFetcher(),
             new DummyCertifiedMembersFetcher(),
             new DummyEmailMembershipNumberMapper(),
