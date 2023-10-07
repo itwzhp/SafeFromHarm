@@ -46,7 +46,10 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
     name: 'Y1'
     tier: 'Dynamic'
   }
-  properties: {}
+  kind: 'functionapp'
+  properties: {
+    reserved: true
+  }
 }
 
 resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
@@ -56,7 +59,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   properties: {
     serverFarmId: hostingPlan.id
     siteConfig: {
-      linuxFxVersion: 'dotnet-isolated|7.0'
+      linuxFxVersion: 'DOTNET-ISOLATED|7.0'
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
