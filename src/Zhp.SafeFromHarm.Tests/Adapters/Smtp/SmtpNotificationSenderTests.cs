@@ -22,7 +22,7 @@ public class SmtpNotificationSenderTests
     [Fact]
     public async Task EmptyList_DoesNothing()
     {
-        await subject.NotifySupervisor("hufec@example.zhp.pl", Enumerable.Empty<ZhpMember>());
+        await subject.NotifySupervisor("hufec@example.zhp.pl", "Hufiec", Enumerable.Empty<ZhpMember>());
 
         clientMock.ReceivedCalls().Should().BeEmpty();
     }
@@ -32,6 +32,7 @@ public class SmtpNotificationSenderTests
     {
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
+            "Hufiec",
             new ZhpMember[]
             {
                 new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"),

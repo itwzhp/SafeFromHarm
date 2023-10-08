@@ -138,6 +138,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'NotificationSender'
           value: 'Dummy' //change to Smtp to enable mails
         }
+        {
+          name: 'FallbackMail'
+          value '5aa6812a.grupy.zhp.net.pl@emea.teams.ms'
+        }
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'

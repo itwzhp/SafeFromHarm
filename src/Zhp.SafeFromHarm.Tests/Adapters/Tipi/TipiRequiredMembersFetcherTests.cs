@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Microsoft.Extensions.Options;
+using System.Net;
+using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Func.Adapters.Tipi;
 
@@ -7,17 +9,17 @@ namespace Zhp.SafeFromHarm.Tests.Adapters.Tipi;
 public class TipiRequiredMembersFetcherTests
 {
     private readonly TestHandler httpHandler = new();
-    private readonly TipiRequiredMembersFetcher subject;
 
-    public TipiRequiredMembersFetcherTests()
-    {
-        subject = new(new(httpHandler) { BaseAddress = new("https://example.zhp.pl") });
-    }
+    private TipiRequiredMembersFetcher BuildSubject(string? fallbackMail = null)
+        => new(
+            new(httpHandler) { BaseAddress = new("https://example.zhp.pl") },
+            Options.Create(new SafeFromHarmOptions { FallbackMail = fallbackMail }));
 
     [Fact]
     public async Task EmptyResults_Exception()
     {
         httpHandler.ResponseBody = "[]";
+        var subject = BuildSubject();
 
         await subject.Awaiting(s => s.GetMembersRequiredToCertify().ToListAsync())
             .Should().ThrowAsync<Exception>();
@@ -50,6 +52,7 @@ public class TipiRequiredMembersFetcherTests
             }
         ]
         """;
+        var subject = BuildSubject();
 
         var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
 
@@ -77,11 +80,72 @@ public class TipiRequiredMembersFetcherTests
             }
         ]
         """;
+        var subject = BuildSubject();
 
         var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
 
-        result.Should().ContainSingle().Which.Should().Be(new ZhpMember("Jan", "Kowalski", "AB123", "choragiew@dolnoslaska.zhp.pl", "Chorągiew Dolnośląska"));
+        result.Should().ContainSingle().Which.SupervisorEmail.Should().Be("choragiew@dolnoslaska.zhp.pl");
     }
+
+    [Fact]
+    public async Task NullMail_SetsFallback()
+    {
+        httpHandler.ResponseBody = """
+        [
+            {
+        	    "memberId": "BD1",
+        	    "personId": 370645,
+        	    "firstName": "Anna",
+        	    "lastName": "Kowalska",
+        	    "birthdate": 1012518000,
+        	    "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
+        	    "allocationUnitContactEmails": null,
+        	    "memberRoles": null
+            }
+        ]
+        """;
+        var subject = BuildSubject("fallback@zhp.pl");
+
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+
+        result.Should().ContainSingle().Which.SupervisorEmail.Should().Be("fallback@zhp.pl");
+    }
+
+    [Fact]
+    public async Task NullMailNullFallback_DoesntReturnItem()
+    {
+        httpHandler.ResponseBody = """
+        [
+            {
+        	    "memberId": "BD1",
+        	    "personId": 370645,
+        	    "firstName": "Anna",
+        	    "lastName": "Kowalska",
+        	    "birthdate": 1012518000,
+        	    "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
+        	    "allocationUnitContactEmails": null,
+        	    "memberRoles": null
+            },
+            {
+        	    "memberId": "BD2",
+        	    "personId": 370645,
+        	    "firstName": "Anna",
+        	    "lastName": "Kowalska",
+        	    "birthdate": 1012518000,
+        	    "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
+        	    "allocationUnitContactEmails": "hufiec@zhp.example.com",
+        	    "memberRoles": null
+            }
+        ]
+        """;
+        var subject = BuildSubject(null);
+
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+
+        result.Should().ContainSingle().Which.SupervisorEmail.Should().Be("hufiec@zhp.example.com");
+    }
+
+
 
     private class TestHandler : HttpMessageHandler
     {

@@ -17,7 +17,7 @@ internal class SmptNotificationSender : INotificationSender
         this.clientFactory = clientFactory;
     }
 
-    public async Task NotifySupervisor(string supervisorEmail, IEnumerable<ZhpMember> missingCertificationMembers)
+    public async Task NotifySupervisor(string supervisorEmail, string supervisorUnitMail, IEnumerable<ZhpMember> missingCertificationMembers)
     {
         var members = missingCertificationMembers.ToList();
         if (!members.Any())
@@ -27,7 +27,7 @@ internal class SmptNotificationSender : INotificationSender
 
         var mail = new MimeMessage(
             from: new[] { new MailboxAddress(options.Sender.DisplayName, options.Sender.Address) },
-            to: new[] { new MailboxAddress(members.First().SupervisorUnitName, supervisorEmail) },
+            to: new[] { new MailboxAddress(supervisorUnitMail, supervisorEmail) },
             "Raport z niewykonanych szkoleń Safe from Harm",
             new TextPart("plain")
             {

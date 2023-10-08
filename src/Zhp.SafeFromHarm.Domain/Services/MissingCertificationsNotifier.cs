@@ -49,7 +49,7 @@ public class MissingCertificationsNotifier
             .Where(m => !certifiedMembers.Contains(m.MembershipNumber));
 
         var notificationsToSend = missingCertifications
-            .GroupBy(m => m.SupervisorEmail);
+            .GroupBy(m => (m.SupervisorEmail, m.SupervisorUnitName));
 
         await foreach(var notification in notificationsToSend)
         {
@@ -58,7 +58,7 @@ public class MissingCertificationsNotifier
             var missingCertificationMembers = await notification.ToListAsync(cancellationToken);
             
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members", notification.Key, missingCertificationMembers.Count);
-            await sender.NotifySupervisor(notification.Key, missingCertificationMembers);
+            await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers);
         }
     }
 }
