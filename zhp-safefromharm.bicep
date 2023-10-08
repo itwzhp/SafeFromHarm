@@ -139,7 +139,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: 'Dummy' //change to Smtp to enable mails
         }
         {
-          name: 'FallbackMail'
+          name: 'SafeFromHarm__FallbackMail'
           value: '5aa6812a.grupy.zhp.net.pl@emea.teams.ms'
         }
       ]
