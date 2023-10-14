@@ -29,7 +29,7 @@ public class MissingCertificationsNotifier
         this.sender = sender;
     }
 
-    public async Task SendNotificationsOnMissingCertificates(CancellationToken cancellationToken)
+    public async Task SendNotificationsOnMissingCertificates(string? onlySendToEmail, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -47,6 +47,9 @@ public class MissingCertificationsNotifier
         var missingCertifications = requiredMembersFetcher
             .GetMembersRequiredToCertify()
             .Where(m => !certifiedMembers.Contains(m.MembershipNumber));
+
+        if (onlySendToEmail != null)
+            missingCertifications = missingCertifications.Where(m => m.SupervisorEmail == onlySendToEmail);
 
         var notificationsToSend = missingCertifications
             .GroupBy(m => (m.SupervisorEmail, m.SupervisorUnitName));

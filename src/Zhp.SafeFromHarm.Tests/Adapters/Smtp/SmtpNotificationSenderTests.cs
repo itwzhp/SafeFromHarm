@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using FluentAssertions;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Zhp.SafeFromHarm.Domain.Model;
@@ -13,10 +14,15 @@ public class SmtpNotificationSenderTests
 
     public SmtpNotificationSenderTests()
     {
+        subject = BuildSubject(new());
+    }
+
+    private SmptNotificationSender BuildSubject(SmtpOptions smtpOptions)
+    {
         var factoryMock = Substitute.For<ISmtpClientFactory>();
         factoryMock.GetClient().Returns(Task.FromResult(clientMock));
 
-        subject = new(Options.Create(new SmtpOptions()), factoryMock);
+        return new(Options.Create(smtpOptions), factoryMock);
     }
 
     [Fact]
@@ -40,5 +46,19 @@ public class SmtpNotificationSenderTests
             });
 
         await clientMock.Received().SendAsync(Arg.Is<MimeMessage>(m => ((TextPart)m.Body).Text.Contains("Anna Nowak (AA03)")));
+    }
+
+    [Fact]
+    public async Task OverrideRecipientConfigured_RecipientIsOverriden()
+    {
+        var subject = BuildSubject(new() { OverrideRecipient = "overriden@example.zhp.pl"});
+
+        await subject.NotifySupervisor(
+            "hufiec@zhp.example.com",
+            "Hufiec",
+            new ZhpMember[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec") });
+
+        clientMock.ReceivedCalls().Single().GetArguments().First().Should().BeOfType<MimeMessage>()
+            .Which.To.Mailboxes.Should().ContainSingle(m => m.Address == "overriden@example.zhp.pl");
     }
 }
