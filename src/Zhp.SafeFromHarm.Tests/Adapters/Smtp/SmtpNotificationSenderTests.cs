@@ -45,7 +45,10 @@ public class SmtpNotificationSenderTests
                 new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec")
             });
 
-        await clientMock.Received().SendAsync(Arg.Is<MimeMessage>(m => ((TextPart)m.Body).Text.Contains("Anna Nowak (AA03)")));
+        var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
+            .Body.As<MultipartAlternative>();
+        sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03)");
+        sentBody.TextBody.Should().Contain("Anna Nowak (AA03)");
     }
 
     [Fact]
