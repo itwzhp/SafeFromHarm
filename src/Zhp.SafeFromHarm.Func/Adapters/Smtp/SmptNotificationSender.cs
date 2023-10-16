@@ -30,7 +30,7 @@ internal class SmptNotificationSender : INotificationSender
             : options.OverrideRecipient;
 
         var mail = new MimeMessage(
-            from: new[] { new MailboxAddress(options.Sender.DisplayName, options.Sender.Address) },
+            from: new[] { new MailboxAddress("Safe from Harm", options.Username) },
             to: new[] { new MailboxAddress(supervisorUnitName, recipientAdress) },
             "Raport z niewykonanych szkoleń Safe from Harm",
             new TextPart("plain")

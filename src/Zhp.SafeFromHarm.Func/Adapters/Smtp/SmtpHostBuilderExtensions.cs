@@ -13,7 +13,6 @@ internal static class SmtpHostBuilderExtensions
                 .BindConfiguration("Smtp")
                 .Validate(opt => !string.IsNullOrWhiteSpace(opt.Host))
                 .Validate(opt => !string.IsNullOrWhiteSpace(opt.Username))
-                .Validate(opt => opt.Sender != null)
                 .Validate(opt => opt.Port > 0);
 
             services.AddTransient<ISmtpClient, SmtpClient>();
