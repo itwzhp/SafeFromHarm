@@ -14,7 +14,7 @@ public class SmtpNotificationSenderTests
 
     public SmtpNotificationSenderTests()
     {
-        subject = BuildSubject(new());
+        subject = BuildSubject(new() { Username = "safe.from.harm@example.zhp.pl" });
     }
 
     private SmptNotificationSender BuildSubject(SmtpOptions smtpOptions)
@@ -51,7 +51,7 @@ public class SmtpNotificationSenderTests
     [Fact]
     public async Task OverrideRecipientConfigured_RecipientIsOverriden()
     {
-        var subject = BuildSubject(new() { OverrideRecipient = "overriden@example.zhp.pl"});
+        var subject = BuildSubject(new() { OverrideRecipient = "overriden@example.zhp.pl", Username = "safe.from.harm@example.zhp.pl" });
 
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",

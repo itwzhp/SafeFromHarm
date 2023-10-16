@@ -6,7 +6,7 @@ internal class SmtpOptions
 {
     public string Host { get; init; } = string.Empty;
 
-    public MailAddress Sender { get; init; } = new("safe.from.harm@mail-auto.zhp.pl", "Safe From Harm");
+    public MailAddress Sender => new(Username, "Safe from Harm");
 
     public string Username { get; init; } = string.Empty;
 

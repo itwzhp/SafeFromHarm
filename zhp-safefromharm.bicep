@@ -13,14 +13,6 @@ param tipiTokenSecret string
 param moodleToken string
 
 @minLength(1)
-param smtpHost string
-
-param smtpPort int
-
-@minLength(1)
-param smtpUsername string
-
-@minLength(1)
 @secure()
 param smtpPassword string
 
@@ -99,15 +91,15 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'Smtp__Host'
-          value: smtpHost
+          value: 'mail-auto-mx.zhp.pl'
         }
         {
           name: 'Smtp__Port'
-          value: string(smtpPort)
+          value: '587'
         }
         {
           name: 'Smtp__Username'
-          value: smtpUsername
+          value: 'safe.from.harm@mail-auto.zhp.pl'
         }
         {
           name: 'Smtp__Password'
