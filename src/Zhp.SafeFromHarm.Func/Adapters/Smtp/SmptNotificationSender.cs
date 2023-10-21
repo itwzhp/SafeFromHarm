@@ -68,6 +68,7 @@ internal class SmptNotificationSender : INotificationSender
             - wszystkich osób pełnoletnich w ZHP - w czasie 3 miesięcy od osiągnięcia pełnoletniości lub wstąpienia do organizacji,
             - osób niepełnoletnich, pełniących funkcje wychowawcze - w momencie mianowania na funkcję,
             - osób otwierających próby na stopnie instruktorskie.
+            Certyfikat jest ważny przez trzy lata od jego wydania.
             
             Wszystkie informacje o Polityce ochrony bezpieczeństwa dzieci, młodzieży i dorosłych w ZHP znajdziesz na stronie internetowej: https://zhp.pl/sfh
             
@@ -105,6 +106,7 @@ internal class SmptNotificationSender : INotificationSender
             <li>osób niepełnoletnich, pełniących funkcje wychowawcze - w momencie mianowania na funkcję,</li>
             <li>osób otwierających próby na stopnie instruktorskie.</li>
             </ul>
+            Certyfikat jest ważny przez trzy lata od jego wydania.
 
             <p>Wszystkie informacje o Polityce ochrony bezpieczeństwa dzieci, młodzieży i dorosłych w ZHP znajdziesz na stronie internetowej: <a href="https://zhp.pl/sfh">zhp.pl/sfh</a></p>
             Z harcerskim pozdrowieniem,<br>
