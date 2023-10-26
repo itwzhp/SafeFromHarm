@@ -16,6 +16,10 @@ param moodleToken string
 @secure()
 param smtpPassword string
 
+@minLength(1)
+@secure()
+param controlTeamsChannelMail string
+
 var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
@@ -123,8 +127,8 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: 'Dummy' //change to Smtp to enable mails
         }
         {
-          name: 'SafeFromHarm__FallbackMail'
-          value: '5aa6812a.grupy.zhp.net.pl@emea.teams.ms'
+          name: 'SafeFromHarm__ControlTeamsChannelMail'
+          value: controlTeamsChannelMail
         }
       ]
       ftpsState: 'FtpsOnly'
