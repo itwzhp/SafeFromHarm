@@ -10,10 +10,10 @@ public class TipiRequiredMembersFetcherTests
 {
     private readonly TestHandler httpHandler = new();
 
-    private TipiRequiredMembersFetcher BuildSubject(string? fallbackMail = null)
+    private TipiRequiredMembersFetcher BuildSubject(string? controlTeamsChannelMail = null)
         => new(
             new(httpHandler) { BaseAddress = new("https://example.zhp.pl") },
-            Options.Create(new SafeFromHarmOptions { FallbackMail = fallbackMail }));
+            Options.Create(new SafeFromHarmOptions { ControlTeamsChannelMail = controlTeamsChannelMail }));
 
     [Fact]
     public async Task EmptyResults_Exception()

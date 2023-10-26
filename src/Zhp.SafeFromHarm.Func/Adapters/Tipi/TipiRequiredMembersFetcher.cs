@@ -9,12 +9,12 @@ namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
 internal class TipiRequiredMembersFetcher : IRequiredMembersFetcher
 {
     private readonly HttpClient httpClient;
-    private readonly string? fallbackMail;
+    private readonly string? controlTeamsChannelMail;
 
     public TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFromHarmOptions> options)
     {
         this.httpClient = httpClient;
-        this.fallbackMail = options.Value.FallbackMail;
+        this.controlTeamsChannelMail = options.Value.ControlTeamsChannelMail;
     }
 
     public async IAsyncEnumerable<ZhpMember> GetMembersRequiredToCertify()
@@ -38,7 +38,7 @@ internal class TipiRequiredMembersFetcher : IRequiredMembersFetcher
         if (entry == null)
             return null;
 
-        var mail = entry.allocationUnitContactEmails?.Split(";").FirstOrDefault() ?? fallbackMail;
+        var mail = entry.allocationUnitContactEmails?.Split(";").FirstOrDefault() ?? controlTeamsChannelMail;
 
         if (mail == null)
             return null;

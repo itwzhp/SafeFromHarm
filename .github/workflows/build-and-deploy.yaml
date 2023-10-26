@@ -34,7 +34,7 @@ jobs:
         subscriptionId: 35e22786-93ea-47c8-902a-16e9d0f03e17
         resourceGroupName: zhp-safefromharm
         template: ./zhp-safefromharm.bicep
-        parameters: tipiTokenId=abc tipiTokenSecret=abc moodleToken=abc smtpPassword=abc
+        parameters: tipiTokenId=abc tipiTokenSecret=abc moodleToken=abc smtpPassword=abc controlTeamsChannelMail=abc@example.com
 
     - name: Prepare publish package
       run: |
@@ -70,7 +70,7 @@ jobs:
         subscriptionId: 35e22786-93ea-47c8-902a-16e9d0f03e17
         resourceGroupName: zhp-safefromharm
         template: ./zhp-safefromharm.bicep
-        parameters: tipiTokenId=${{ secrets.TIPI_TOKEN_ID }} tipiTokenSecret=${{ secrets.TIPI_TOKEN_SECRET }} moodleToken=${{ secrets.MOODLE_TOKEN }} smtpPassword=${{ secrets.MAIL_PASSWORD }}
+        parameters: tipiTokenId=${{ secrets.TIPI_TOKEN_ID }} tipiTokenSecret=${{ secrets.TIPI_TOKEN_SECRET }} moodleToken=${{ secrets.MOODLE_TOKEN }} smtpPassword=${{ secrets.MAIL_PASSWORD }} controlTeamsChannelMail=${{ secrets.CONTROL_TEAMS_CHANNEL_MAIL }}
 
     - name: Upload files
       uses: Azure/functions-action@v1
