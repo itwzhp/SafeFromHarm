@@ -12,6 +12,7 @@ public class MissingCertificationsNotifier
     private readonly ICertifiedMembersFetcher certifiedMembersFetcher;
     private readonly IEmailMembershipNumberMapper numberMapper;
     private readonly INotificationSender sender;
+    private readonly ISummarySender summarySender;
 
     public MissingCertificationsNotifier(
         ILogger<MissingCertificationsNotifier> logger,
@@ -19,7 +20,8 @@ public class MissingCertificationsNotifier
         IRequiredMembersFetcher requiredMembersFetcher,
         ICertifiedMembersFetcher certifiedMembersFetcher,
         IEmailMembershipNumberMapper numberMapper,
-        INotificationSender sender)
+        INotificationSender sender,
+        ISummarySender summarySender)
     {
         this.logger = logger;
         this.options = options.Value;
@@ -27,6 +29,7 @@ public class MissingCertificationsNotifier
         this.certifiedMembersFetcher = certifiedMembersFetcher;
         this.numberMapper = numberMapper;
         this.sender = sender;
+        this.summarySender = summarySender;
     }
 
     public async Task SendNotificationsOnMissingCertificates(string? onlySendToEmail, CancellationToken cancellationToken)
@@ -46,21 +49,25 @@ public class MissingCertificationsNotifier
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var membersWithCertInformation = requiredMembersFetcher
+        var membersWithCertInformation = await requiredMembersFetcher
             .GetMembersRequiredToCertify()
-            .Select(m => (member: m, certificationDate: certifiedMembers.GetValueOrDefault(m.MembershipNumber, null)));
+            .Select(m => (member: m, certificationDate: certifiedMembers.GetValueOrDefault(m.MembershipNumber, null)))
+            .ToListAsync(cancellationToken);
+
+        var certifiedCount = membersWithCertInformation.Count(m => m.certificationDate != null);
+        var uncertifiedCount = membersWithCertInformation.Count(m => m.certificationDate == null);
 
         if (onlySendToEmail != null)
-            membersWithCertInformation = membersWithCertInformation.Where(m => m.member.SupervisorEmail == onlySendToEmail);
+            membersWithCertInformation = membersWithCertInformation.Where(m => m.member.SupervisorEmail == onlySendToEmail).ToList();
 
         var notificationsToSend = membersWithCertInformation
             .GroupBy(m => (m.member.SupervisorEmail, m.member.SupervisorUnitName));
 
-        await foreach(var notification in notificationsToSend)
+        foreach(var notification in notificationsToSend)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var groupedByCert = await notification.ToLookupAsync(n => n.certificationDate.HasValue, cancellationToken);
+            var groupedByCert = notification.ToLookup(n => n.certificationDate.HasValue);
 
             var missingCertificationMembers = groupedByCert[false].Select(m => m.member).ToList();
             var certified = groupedByCert[true].Select(m => (m.member, m.certificationDate!.Value)).ToList();
@@ -68,5 +75,7 @@ public class MissingCertificationsNotifier
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
             await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers, certified);
         }
+
+        // await summarySender.SendSummary(certifiedCount, uncertifiedCount, onlySendToEmail); - odkomentować, żeby włączyć podsumowania
     }
 }

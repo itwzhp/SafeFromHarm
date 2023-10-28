@@ -9,7 +9,7 @@ namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
 internal class TipiRequiredMembersFetcher : IRequiredMembersFetcher
 {
     private readonly HttpClient httpClient;
-    private readonly string? controlTeamsChannelMail;
+    private readonly string controlTeamsChannelMail;
 
     public TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFromHarmOptions> options)
     {
@@ -39,9 +39,6 @@ internal class TipiRequiredMembersFetcher : IRequiredMembersFetcher
             return null;
 
         var mail = entry.allocationUnitContactEmails?.Split(";").FirstOrDefault() ?? controlTeamsChannelMail;
-
-        if (mail == null)
-            return null;
 
         return new(
                 entry.firstName,
