@@ -5,9 +5,9 @@ namespace Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 
 public class DummySummarySender : ISummarySender
 {
-    private readonly Logger<DummySummarySender> logger;
+    private readonly ILogger<DummySummarySender> logger;
 
-    public DummySummarySender(Logger<DummySummarySender> logger)
+    public DummySummarySender(ILogger<DummySummarySender> logger)
     {
         this.logger = logger;
     }

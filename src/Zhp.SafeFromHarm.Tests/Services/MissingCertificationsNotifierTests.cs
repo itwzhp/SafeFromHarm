@@ -21,7 +21,8 @@ public class MissingCertificationsNotifierTests
             new DummyRequiredMembersFetcher(),
             new DummyCertifiedMembersFetcher(),
             new DummyEmailMembershipNumberMapper(),
-            senderSubstitute);
+            senderSubstitute,
+            new DummySummarySender(Substitute.For<ILogger<DummySummarySender>>()));
     }
 
     [Fact]

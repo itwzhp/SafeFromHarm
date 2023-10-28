@@ -54,8 +54,7 @@ var host = new HostBuilder()
 
         services.AddOptions<SafeFromHarmOptions>()
             .BindConfiguration("SafeFromHarm")
-            .Validate(sfh => sfh.CertificateExpiryDays > 0)
-            .Validate(sfh => !string.IsNullOrEmpty(sfh.ControlTeamsChannelMail));
+            .Validate(sfh => sfh.CertificateExpiryDays > 0);
 
         services.AddTransient<MissingCertificationsNotifier>();
     })

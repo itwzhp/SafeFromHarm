@@ -9,7 +9,7 @@ internal class SmtpSummarySender : ISummarySender
 {
     private readonly ISmtpClientFactory clientFactory;
     private readonly SmtpOptions smtpOptions;
-    private readonly string teamsChannelMail;
+    private readonly string? teamsChannelMail;
 
     public SmtpSummarySender(ISmtpClientFactory clientFactory, IOptions<SmtpOptions> smtpOptions, IOptions<SafeFromHarmOptions> sfhOptions)
     {
@@ -20,6 +20,9 @@ internal class SmtpSummarySender : ISummarySender
 
     public async Task SendSummary(int numberOfCertifedMembers, int numberOfMissingCertificates, string? mailFilter)
     {
+        if (teamsChannelMail == null)
+            return;
+
         var client = await clientFactory.GetClient();
 
         var sum = numberOfCertifedMembers + numberOfMissingCertificates;

@@ -4,5 +4,5 @@ public class SafeFromHarmOptions
 {
     public int CertificateExpiryDays { get; init; } = 365 * 3 + 1;
 
-    public string ControlTeamsChannelMail { get; init; } = string.Empty;
+    public string? ControlTeamsChannelMail { get; init; }
 }
