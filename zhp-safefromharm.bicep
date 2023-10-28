@@ -126,10 +126,12 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'NotificationSender'
           value: 'Dummy' //change to Smtp to enable mails
         }
-        // { -- uncomment to enable sending to teams channel
-        //   name: 'SafeFromHarm__ControlTeamsChannelMail'
-        //   value: controlTeamsChannelMail
-        // } 
+        { 
+          // uncomment to enable sending to teams channel
+          // name: 'SafeFromHarm__ControlTeamsChannelMail'
+          name: 'UNUSED_____SafeFromHarm__ControlTeamsChannelMail'
+          value: controlTeamsChannelMail
+        } 
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
