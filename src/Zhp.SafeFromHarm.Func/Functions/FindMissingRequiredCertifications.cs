@@ -36,5 +36,15 @@ public class FindMissingRequiredCertifications
         return req.CreateResponse();
     }
 
+    [Function("FindMissingRequiredCertificationsSchedule")]
+    public async Task RunSchedule([TimerTrigger("0 35 2 28 * *")] TimerInfo info, FunctionContext context)
+    {
+        _logger.LogInformation("Starting FindMissingRequiredCertificationsSchedule");
+
+        await notifier.SendNotificationsOnMissingCertificates(null, context.CancellationToken);
+
+        _logger.LogInformation("FindMissingRequiredCertificationsSchedule Finished.");
+    }
+
     private record TriggerContract(string RecipientFilter);
 }
