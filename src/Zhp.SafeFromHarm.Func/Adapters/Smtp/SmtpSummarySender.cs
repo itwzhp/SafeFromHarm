@@ -18,7 +18,7 @@ internal class SmtpSummarySender : ISummarySender
         this.teamsChannelMail = sfhOptions.Value.ControlTeamsChannelMail;
     }
 
-    public async Task SendSummary(int numberOfCertifedMembers, int numberOfMissingCertificates, string? mailFilter)
+    public async Task SendSummary(int numberOfCertifedMembers, int numberOfMissingCertificates, string? mailFilter, IReadOnlyCollection<(string Email, string UnitName)> failedRecipients)
     {
         if (teamsChannelMail == null)
             return;
@@ -27,9 +27,7 @@ internal class SmtpSummarySender : ISummarySender
 
         var sum = numberOfCertifedMembers + numberOfMissingCertificates;
 
-        var bodyBuilder = new BodyBuilder
-        {
-            HtmlBody = $"""
+        var body = $"""
                 Zakończono wysyłkę maili do jednostek
                 <ul>
                 <li>Ukończonych szkoleń: {numberOfCertifedMembers} ({(double)numberOfCertifedMembers / sum:p})</li>
@@ -37,7 +35,18 @@ internal class SmtpSummarySender : ISummarySender
                 <li>Razem: {sum}</li>
                 </ul>
                 {(mailFilter == null ? null : $"Mail wysłano <strong>tylko</strong> na adres " + mailFilter)}
-                """,
+                """;
+        if (failedRecipients.Any())
+        {
+            body += "<br>Nie udało się wysłać maila do poniższych jednostek:<ol>";
+            foreach (var (Email, UnitName) in failedRecipients)
+                body += $"<li>{UnitName} ({Email})</li>";
+            body += "</ol>";
+        }
+
+        var bodyBuilder = new BodyBuilder
+        {
+            HtmlBody = body,
             TextBody = "------"
         };
 

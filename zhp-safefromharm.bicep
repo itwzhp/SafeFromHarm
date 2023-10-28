@@ -124,7 +124,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'NotificationSender'
-          value: 'Dummy' //change to Smtp to enable mails
+          value: 'Smtp'
         }
         { 
           // uncomment to enable sending to teams channel

@@ -8,7 +8,7 @@ namespace Zhp.SafeFromHarm.Tests.Adapters.Smtp;
 
 public class SmtpNotificationSenderTests
 {
-    private readonly SmptNotificationSender subject;
+    private readonly SmtpNotificationSender subject;
     private readonly ISmtpClient clientMock = Substitute.For<ISmtpClient>();
 
     public SmtpNotificationSenderTests()
@@ -16,7 +16,7 @@ public class SmtpNotificationSenderTests
         subject = BuildSubject(new() { Username = "safe.from.harm@example.zhp.pl" });
     }
 
-    private SmptNotificationSender BuildSubject(SmtpOptions smtpOptions)
+    private SmtpNotificationSender BuildSubject(SmtpOptions smtpOptions)
     {
         var factoryMock = Substitute.For<ISmtpClientFactory>();
         factoryMock.GetClient().Returns(Task.FromResult(clientMock));

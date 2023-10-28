@@ -12,7 +12,7 @@ public class DummySummarySender : ISummarySender
         this.logger = logger;
     }
 
-    public Task SendSummary(int numberOfCertifedMembers, int numberOfMissingCertificates, string? mailFilter)
+    public Task SendSummary(int numberOfCertifedMembers, int numberOfMissingCertificates, string? mailFilter, IReadOnlyCollection<(string Email, string UnitName)> failedRecipients)
     {
         logger.LogDebug("Finished sending - {nonCertifed} not certified, {certified} certified. Filter: {mailFilter}", numberOfMissingCertificates, numberOfCertifedMembers, mailFilter);
         return Task.CompletedTask;

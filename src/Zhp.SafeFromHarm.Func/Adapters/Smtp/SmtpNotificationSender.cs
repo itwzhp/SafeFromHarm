@@ -7,12 +7,12 @@ using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
-internal partial class SmptNotificationSender : INotificationSender
+internal partial class SmtpNotificationSender : INotificationSender
 {
     private readonly SmtpOptions options;
     private readonly ISmtpClientFactory clientFactory;
 
-    public SmptNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory)
+    public SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory)
     {
         this.options = options.Value;
         this.clientFactory = clientFactory;

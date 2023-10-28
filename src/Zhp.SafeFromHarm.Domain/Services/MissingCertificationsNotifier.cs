@@ -63,6 +63,8 @@ public class MissingCertificationsNotifier
         var notificationsToSend = membersWithCertInformation
             .GroupBy(m => (m.member.SupervisorEmail, m.member.SupervisorUnitName));
 
+        var failedRecipients = new List<(string Email, string UnitName)>();
+
         foreach(var notification in notificationsToSend)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -73,9 +75,17 @@ public class MissingCertificationsNotifier
             var certified = groupedByCert[true].Select(m => (m.member, m.certificationDate!.Value)).ToList();
             
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
-            await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers, certified);
+            try
+            {
+                await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers, certified);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Unable to send message to {unit} <{email}>", notification.Key.SupervisorUnitName, notification.Key.SupervisorEmail);
+                failedRecipients.Add((notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName));
+            }
         }
 
-        // await summarySender.SendSummary(certifiedCount, uncertifiedCount, onlySendToEmail); - odkomentować, żeby włączyć podsumowania
+        await summarySender.SendSummary(certifiedCount, uncertifiedCount, onlySendToEmail, failedRecipients);
     }
 }

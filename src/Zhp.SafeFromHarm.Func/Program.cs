@@ -47,7 +47,7 @@ var host = new HostBuilder()
                         .AddTransient<INotificationSender, DummyNotificationSender>()
                         .AddTransient<ISummarySender, DummySummarySender>(),
             "Smtp" => services
-                        .AddTransient<INotificationSender, SmptNotificationSender>()
+                        .AddTransient<INotificationSender, SmtpNotificationSender>()
                         .AddTransient<ISummarySender, SmtpSummarySender>(),
             _ => throw new Exception($"Unknown NotificationSender config value: {ctx.Configuration["NotificationSender"] ?? "null"}")
         };
