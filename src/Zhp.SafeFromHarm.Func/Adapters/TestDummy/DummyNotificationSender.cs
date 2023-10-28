@@ -13,9 +13,15 @@ internal class DummyNotificationSender : INotificationSender
         this.logger = logger;
     }
 
-    public Task NotifySupervisor(string supervisorEmail, string supervisorUnitMail, IEnumerable<ZhpMember> missingCertificationMembers)
+    public Task NotifySupervisor(string supervisorEmail, string supervisorUnitMail, IEnumerable<ZhpMember> missingCertificationMembers, IEnumerable<(ZhpMember Member, DateOnly CertificationDate)> certifiedMembers)
     {
-        logger.LogDebug("Simulating e-mail to {supervisorUnitMail} <{supervisorEmail}>, list of members: {members}", supervisorEmail, supervisorUnitMail, string.Join(';', missingCertificationMembers));
+        if(logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("Simulating e-mail to {supervisorUnitMail} <{supervisorEmail}>, list of missing members: {members}, list of certified members: {certMembers}",
+                supervisorEmail,
+                supervisorUnitMail,
+                string.Join(';', missingCertificationMembers),
+                string.Join(';', certifiedMembers));
+
         return Task.CompletedTask;
     }
 }

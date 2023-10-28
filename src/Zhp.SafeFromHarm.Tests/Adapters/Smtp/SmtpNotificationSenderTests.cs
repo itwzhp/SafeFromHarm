@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Zhp.SafeFromHarm.Domain.Model;
@@ -28,13 +27,13 @@ public class SmtpNotificationSenderTests
     [Fact]
     public async Task EmptyList_DoesNothing()
     {
-        await subject.NotifySupervisor("hufec@example.zhp.pl", "Hufiec", Enumerable.Empty<ZhpMember>());
+        await subject.NotifySupervisor("hufec@example.zhp.pl", "Hufiec", Enumerable.Empty<ZhpMember>(), Enumerable.Empty<(ZhpMember, DateOnly)>());
 
         clientMock.ReceivedCalls().Should().BeEmpty();
     }
 
     [Fact]
-    public async Task SeveralItems_BuildsContent()
+    public async Task SeveralPeopleToCertify_BuildsContent()
     {
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
@@ -43,12 +42,52 @@ public class SmtpNotificationSenderTests
             {
                 new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"),
                 new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec")
-            });
+            },
+            Enumerable.Empty<(ZhpMember, DateOnly)>());
 
         var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
             .Body.As<MultipartAlternative>();
         sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03)");
         sentBody.TextBody.Should().Contain("Anna Nowak (AA03)");
+    }
+    
+    [Fact]
+    public async Task SeveralPeopleToCertify_PlainTextHasCorrectLinks()
+    {
+        await subject.NotifySupervisor(
+            "hufiec@zhp.example.com",
+            "Hufiec",
+            new ZhpMember[]
+            {
+                new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"),
+                new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec")
+            },
+            Enumerable.Empty<(ZhpMember, DateOnly)>());
+
+        var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
+            .Body.As<MultipartAlternative>();
+
+        sentBody.TextBody.Should().Contain("Harcerskim Serwisie Szkoleniowym (https://edu.zhp.pl/course/view.php?id=47)");
+        sentBody.TextBody.Should().NotContainAny("<", ">");
+    }
+
+    [Fact]
+    public async Task SeveralPeopleCertified_BuildsContent()
+    {
+        await subject.NotifySupervisor(
+            "hufiec@zhp.example.com",
+            "Hufiec",
+            Enumerable.Empty<ZhpMember>(),
+            new (ZhpMember, DateOnly)[]
+            {
+                (new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"), new(2023, 10, 02)),
+                (new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec"), new(2023, 12, 02))
+            });
+
+        var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
+            .Body.As<MultipartAlternative>();
+        sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03) - 02.12.2023");
+        sentBody.TextBody.Should().Contain("Anna Nowak (AA03) - 02.12.2023");
     }
 
     [Fact]
@@ -59,7 +98,8 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
             "Hufiec",
-            new ZhpMember[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec") });
+            new ZhpMember[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec") },
+            Enumerable.Empty<(ZhpMember, DateOnly)>());
 
         clientMock.ReceivedCalls().Single().GetArguments().First().Should().BeOfType<MimeMessage>()
             .Which.To.Mailboxes.Should().ContainSingle(m => m.Address == "overriden@example.zhp.pl");

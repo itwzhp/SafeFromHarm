@@ -37,31 +37,36 @@ public class MissingCertificationsNotifier
         var certifiedMembers = await certifiedMembersFetcher
             .GetCertifiedMembers()
             .Where(m => m.CertificationDate >= cerificationExpiryThreshold)
-            .SelectAwait(async m => await numberMapper.GetMembershipNumberForEmail(m.EmailAddress))
-            .OfType<string>()
-            .ToHashSetAsync(StringComparer.OrdinalIgnoreCase, cancellationToken);
+            .SelectAwait(async m => (membershipId: await numberMapper.GetMembershipNumberForEmail(m.EmailAddress), certificationDate: m.CertificationDate))
+            .Where(m => !string.IsNullOrEmpty(m.membershipId))
+            .GroupBy(m => m.membershipId).SelectAwait(async g => await g.FirstAsync()) //Distinct by membership id
+            .ToDictionaryAsync(m => m.membershipId!, m => (DateOnly?) m.certificationDate, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
         logger.LogInformation("Found {number} certified members", certifiedMembers.Count);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var missingCertifications = requiredMembersFetcher
+        var membersWithCertInformation = requiredMembersFetcher
             .GetMembersRequiredToCertify()
-            .Where(m => !certifiedMembers.Contains(m.MembershipNumber));
+            .Select(m => (member: m, certificationDate: certifiedMembers.GetValueOrDefault(m.MembershipNumber, null)));
 
         if (onlySendToEmail != null)
-            missingCertifications = missingCertifications.Where(m => m.SupervisorEmail == onlySendToEmail);
+            membersWithCertInformation = membersWithCertInformation.Where(m => m.member.SupervisorEmail == onlySendToEmail);
 
-        var notificationsToSend = missingCertifications
-            .GroupBy(m => (m.SupervisorEmail, m.SupervisorUnitName));
+        var notificationsToSend = membersWithCertInformation
+            .GroupBy(m => (m.member.SupervisorEmail, m.member.SupervisorUnitName));
 
         await foreach(var notification in notificationsToSend)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var missingCertificationMembers = await notification.ToListAsync(cancellationToken);
+            var groupedByCert = await notification.ToLookupAsync(n => n.certificationDate.HasValue, cancellationToken);
+
+            var missingCertificationMembers = groupedByCert[false].Select(m => m.member).ToList();
+            var certified = groupedByCert[true].Select(m => (m.member, m.certificationDate!.Value)).ToList();
             
-            logger.LogInformation("Sending notification to {supervisor} about {count} missing members", notification.Key, missingCertificationMembers.Count);
-            await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers);
+            logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
+            await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers, certified);
         }
     }
 }
