@@ -127,9 +127,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: 'Smtp'
         }
         { 
-          // uncomment to enable sending to teams channel
-          // name: 'SafeFromHarm__ControlTeamsChannelMail'
-          name: 'UNUSED_____SafeFromHarm__ControlTeamsChannelMail'
+          name: 'SafeFromHarm__ControlTeamsChannelMail'
           value: controlTeamsChannelMail
         } 
       ]
