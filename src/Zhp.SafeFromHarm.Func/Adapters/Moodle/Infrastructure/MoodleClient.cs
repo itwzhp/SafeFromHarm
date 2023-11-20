@@ -4,17 +4,10 @@ using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 
-internal class MoodleClient
+internal class MoodleClient(HttpClient httpClient, IOptions<MoodleOptions> options)
 {
-    private readonly HttpClient httpClient;
-    private readonly MoodleOptions options;
+    private readonly MoodleOptions options = options.Value;
     private readonly JsonSerializerOptions jsonSerializerOptions = new() { PropertyNamingPolicy = new MoodlePropertyNamingPolicy() };
-
-    public MoodleClient(HttpClient httpClient, IOptions<MoodleOptions> options)
-    {
-        this.httpClient = httpClient;
-        this.options = options.Value;
-    }
 
     public async ValueTask<T> CallMoodle<T>(MoodleFunctions function, params (string Key, string Value)[] parameters)
     {

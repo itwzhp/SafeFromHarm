@@ -6,16 +6,9 @@ using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Moodle;
 
-internal class MoodleCertifiedMembersFetcher : ICertifiedMembersFetcher
+internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<MoodleOptions> options) : ICertifiedMembersFetcher
 {
-    private readonly MoodleClient client;
-    private readonly MoodleOptions options;
-
-    public MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<MoodleOptions> options)
-    {
-        this.client = client;
-        this.options = options.Value;
-    }
+    private readonly MoodleOptions options = options.Value;
 
     public async IAsyncEnumerable<CertifiedMember> GetCertifiedMembers()
     {

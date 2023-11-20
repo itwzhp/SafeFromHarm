@@ -4,33 +4,16 @@ using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Domain.Services;
 
-public class MissingCertificationsNotifier
+public class MissingCertificationsNotifier(
+    ILogger<MissingCertificationsNotifier> logger,
+    IOptions<SafeFromHarmOptions> options,
+    IRequiredMembersFetcher requiredMembersFetcher,
+    ICertifiedMembersFetcher certifiedMembersFetcher,
+    IEmailMembershipNumberMapper numberMapper,
+    INotificationSender sender,
+    ISummarySender summarySender)
 {
-    private readonly ILogger<MissingCertificationsNotifier> logger;
-    private readonly SafeFromHarmOptions options;
-    private readonly IRequiredMembersFetcher requiredMembersFetcher;
-    private readonly ICertifiedMembersFetcher certifiedMembersFetcher;
-    private readonly IEmailMembershipNumberMapper numberMapper;
-    private readonly INotificationSender sender;
-    private readonly ISummarySender summarySender;
-
-    public MissingCertificationsNotifier(
-        ILogger<MissingCertificationsNotifier> logger,
-        IOptions<SafeFromHarmOptions> options,
-        IRequiredMembersFetcher requiredMembersFetcher,
-        ICertifiedMembersFetcher certifiedMembersFetcher,
-        IEmailMembershipNumberMapper numberMapper,
-        INotificationSender sender,
-        ISummarySender summarySender)
-    {
-        this.logger = logger;
-        this.options = options.Value;
-        this.requiredMembersFetcher = requiredMembersFetcher;
-        this.certifiedMembersFetcher = certifiedMembersFetcher;
-        this.numberMapper = numberMapper;
-        this.sender = sender;
-        this.summarySender = summarySender;
-    }
+    private readonly SafeFromHarmOptions options = options.Value;
 
     public async Task SendNotificationsOnMissingCertificates(string? onlySendToEmail, CancellationToken cancellationToken)
     {

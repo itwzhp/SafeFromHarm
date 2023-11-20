@@ -6,16 +6,9 @@ using Zhp.SafeFromHarm.Domain.Services;
 
 namespace Zhp.SafeFromHarm.Func.Functions;
 
-public class FindMissingRequiredCertifications
+public class FindMissingRequiredCertifications(ILoggerFactory loggerFactory, MissingCertificationsNotifier notifier)
 {
-    private readonly ILogger _logger;
-    private readonly MissingCertificationsNotifier notifier;
-
-    public FindMissingRequiredCertifications(ILoggerFactory loggerFactory, MissingCertificationsNotifier notifier)
-    {
-        _logger = loggerFactory.CreateLogger<FindMissingRequiredCertifications>();
-        this.notifier = notifier;
-    }
+    private readonly ILogger _logger = loggerFactory.CreateLogger<FindMissingRequiredCertifications>();
 
     [Function("FindMissingRequiredCertifications")]
     public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)

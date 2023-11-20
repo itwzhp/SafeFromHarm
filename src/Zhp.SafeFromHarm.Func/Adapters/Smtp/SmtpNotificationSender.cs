@@ -7,16 +7,9 @@ using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
-internal partial class SmtpNotificationSender : INotificationSender
+internal partial class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory) : INotificationSender
 {
-    private readonly SmtpOptions options;
-    private readonly ISmtpClientFactory clientFactory;
-
-    public SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory)
-    {
-        this.options = options.Value;
-        this.clientFactory = clientFactory;
-    }
+    private readonly SmtpOptions options = options.Value;
 
     public async Task NotifySupervisor(string supervisorEmail, string supervisorUnitName, IEnumerable<ZhpMember> missingCertificationMembers, IEnumerable<(ZhpMember Member, DateOnly CertificationDate)> certifiedMembers)
     {

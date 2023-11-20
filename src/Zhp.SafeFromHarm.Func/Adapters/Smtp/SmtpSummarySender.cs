@@ -5,18 +5,10 @@ using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
-internal class SmtpSummarySender : ISummarySender
+internal class SmtpSummarySender(ISmtpClientFactory clientFactory, IOptions<SmtpOptions> smtpOptions, IOptions<SafeFromHarmOptions> sfhOptions) : ISummarySender
 {
-    private readonly ISmtpClientFactory clientFactory;
-    private readonly SmtpOptions smtpOptions;
-    private readonly string? teamsChannelMail;
-
-    public SmtpSummarySender(ISmtpClientFactory clientFactory, IOptions<SmtpOptions> smtpOptions, IOptions<SafeFromHarmOptions> sfhOptions)
-    {
-        this.clientFactory = clientFactory;
-        this.smtpOptions = smtpOptions.Value;
-        this.teamsChannelMail = sfhOptions.Value.ControlTeamsChannelMail;
-    }
+    private readonly SmtpOptions smtpOptions = smtpOptions.Value;
+    private readonly string? teamsChannelMail = sfhOptions.Value.ControlTeamsChannelMail;
 
     public async Task SendSummary(int numberOfCertifedMembers, int numberOfMissingCertificates, string? mailFilter, IReadOnlyCollection<(string Email, string UnitName)> failedRecipients)
     {

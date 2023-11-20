@@ -4,15 +4,8 @@ using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 
-internal class DummyNotificationSender : INotificationSender
+internal class DummyNotificationSender(ILogger<DummyNotificationSender> logger) : INotificationSender
 {
-    private readonly ILogger<DummyNotificationSender> logger;
-
-    public DummyNotificationSender(ILogger<DummyNotificationSender> logger)
-    {
-        this.logger = logger;
-    }
-
     public Task NotifySupervisor(string supervisorEmail, string supervisorUnitMail, IEnumerable<ZhpMember> missingCertificationMembers, IEnumerable<(ZhpMember Member, DateOnly CertificationDate)> certifiedMembers)
     {
         if(logger.IsEnabled(LogLevel.Debug))

@@ -5,17 +5,10 @@ using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Moodle;
 
-internal class MoodleEmailMembershipNumberMapper : IEmailMembershipNumberMapper
+internal class MoodleEmailMembershipNumberMapper(MoodleClient client, IOptions<MoodleOptions> options) : IEmailMembershipNumberMapper
 {
-    private readonly MoodleClient client;
-    private readonly MoodleOptions options;
+    private readonly MoodleOptions options = options.Value;
     private IReadOnlyDictionary<string, string?>? numbersByMail;
-
-    public MoodleEmailMembershipNumberMapper(MoodleClient client, IOptions<MoodleOptions> options)
-    {
-        this.client = client;
-        this.options = options.Value;
-    }
 
     public async ValueTask<string?> GetMembershipNumberForEmail(string email)
     {

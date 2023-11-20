@@ -6,16 +6,9 @@ using Zhp.SafeFromHarm.Domain.Ports;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
 
-internal class TipiRequiredMembersFetcher : IRequiredMembersFetcher
+internal class TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFromHarmOptions> options) : IRequiredMembersFetcher
 {
-    private readonly HttpClient httpClient;
-    private readonly string? controlTeamsChannelMail;
-
-    public TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFromHarmOptions> options)
-    {
-        this.httpClient = httpClient;
-        this.controlTeamsChannelMail = options.Value.ControlTeamsChannelMail;
-    }
+    private readonly string? controlTeamsChannelMail = options.Value.ControlTeamsChannelMail;
 
     public async IAsyncEnumerable<ZhpMember> GetMembersRequiredToCertify()
     {
