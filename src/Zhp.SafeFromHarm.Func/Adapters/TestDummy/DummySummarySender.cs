@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 

@@ -56,7 +56,7 @@ public class TipiRequiredMembersFetcherTests
 
         var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
 
-        result.Should().BeEquivalentTo(new ZhpMember[]
+        result.Should().BeEquivalentTo(new MemberToCertify[]
         {
             new("Jan", "Kowalski", "AA01", "radomsko@zhp.pl", "Hufiec Radomsko"),
             new("Anna", "Malinowska", "AA02", "cieszyn@zhp.pl", "Hufiec Ziemi Cieszyńskiej"),

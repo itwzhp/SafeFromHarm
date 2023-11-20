@@ -1,4 +1,4 @@
-﻿namespace Zhp.SafeFromHarm.Domain.Ports;
+﻿namespace Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 public interface ISummarySender
 {

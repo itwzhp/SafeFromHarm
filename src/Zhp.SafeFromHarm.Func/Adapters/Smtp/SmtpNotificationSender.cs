@@ -3,7 +3,7 @@ using MimeKit;
 using System.Text;
 using System.Text.RegularExpressions;
 using Zhp.SafeFromHarm.Domain.Model;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
@@ -11,7 +11,7 @@ internal partial class SmtpNotificationSender(IOptions<SmtpOptions> options, ISm
 {
     private readonly SmtpOptions options = options.Value;
 
-    public async Task NotifySupervisor(string supervisorEmail, string supervisorUnitName, IEnumerable<ZhpMember> missingCertificationMembers, IEnumerable<(ZhpMember Member, DateOnly CertificationDate)> certifiedMembers)
+    public async Task NotifySupervisor(string supervisorEmail, string supervisorUnitName, IEnumerable<MemberToCertify> missingCertificationMembers, IEnumerable<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
     {
         var membersToCertify = missingCertificationMembers.ToList();
         var certifiedMemebersList = certifiedMembers.ToList();
@@ -58,7 +58,7 @@ internal partial class SmtpNotificationSender(IOptions<SmtpOptions> options, ISm
     [GeneratedRegex(@"<a href=""(?<url>[^""]+)"">(?<text>[^<]+)</a>")]
     private static partial Regex LinkRegex();
 
-    private static string BuildHtmlContent(List<ZhpMember> missingCertificationMembers, List<(ZhpMember Member, DateOnly CertificationDate)> certifiedMembers)
+    private static string BuildHtmlContent(List<MemberToCertify> missingCertificationMembers, List<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
     {
         var b = new StringBuilder("Czuwaj,<br>\n");
 

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Polly;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
 

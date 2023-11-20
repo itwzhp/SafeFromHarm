@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Zhp.SafeFromHarm.Domain.Model;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
 

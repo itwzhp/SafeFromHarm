@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MimeKit;
 using Zhp.SafeFromHarm.Domain;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 

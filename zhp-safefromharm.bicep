@@ -109,7 +109,12 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'Smtp__Password'
           value: smtpPassword
         }
+        { 
+          name: 'SafeFromHarm__ControlTeamsChannelMail'
+          value: controlTeamsChannelMail
+        } 
 
+        // ports for reports
         {
           name: 'CertifiedMembersFetcher'
           value: 'Moodle'
@@ -126,10 +131,24 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'NotificationSender'
           value: 'Smtp'
         }
-        { 
-          name: 'SafeFromHarm__ControlTeamsChannelMail'
-          value: controlTeamsChannelMail
-        } 
+
+        // ports for account creation
+        {
+          name: 'AccountCreator'
+          value: 'Dummy'
+        }
+        {
+          name: 'AccountCreationResultPublisher'
+          value: 'Dummy'
+        }
+        {
+          name: 'MemberMailAccountChecker'
+          value: 'Dummy'
+        }
+        {
+          name: 'MembersFetcher'
+          value: 'Dummy'
+        }
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'

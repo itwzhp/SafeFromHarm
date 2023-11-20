@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Model;
-using Zhp.SafeFromHarm.Domain.Ports;
+using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
 
@@ -10,7 +10,7 @@ internal class TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFr
 {
     private readonly string? controlTeamsChannelMail = options.Value.ControlTeamsChannelMail;
 
-    public async IAsyncEnumerable<ZhpMember> GetMembersRequiredToCertify()
+    public async IAsyncEnumerable<MemberToCertify> GetMembersRequiredToCertify()
     {
         var response = await httpClient.GetAsync("sfhmembersfortrainig");
         response.EnsureSuccessStatusCode();
@@ -18,7 +18,7 @@ internal class TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFr
         var result = JsonSerializer.DeserializeAsyncEnumerable<ResultEntry>(await response.Content.ReadAsStreamAsync())
             ?? throw new Exception("Received null result from Tipi");
 
-        var members = await result.Select(Map).OfType<ZhpMember>().ToListAsync();
+        var members = await result.Select(Map).OfType<MemberToCertify>().ToListAsync();
         if (!members.Any())
             throw new Exception("Received empty results from Tipi");
 
@@ -26,7 +26,7 @@ internal class TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFr
             yield return member;
     }
 
-    private ZhpMember? Map(ResultEntry? entry)
+    private MemberToCertify? Map(ResultEntry? entry)
     {
         if (entry == null)
             return null;

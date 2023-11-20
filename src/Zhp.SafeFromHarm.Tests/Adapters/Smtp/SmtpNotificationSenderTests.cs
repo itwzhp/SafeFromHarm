@@ -27,7 +27,7 @@ public class SmtpNotificationSenderTests
     [Fact]
     public async Task EmptyList_DoesNothing()
     {
-        await subject.NotifySupervisor("hufec@example.zhp.pl", "Hufiec", Enumerable.Empty<ZhpMember>(), Enumerable.Empty<(ZhpMember, DateOnly)>());
+        await subject.NotifySupervisor("hufec@example.zhp.pl", "Hufiec", Enumerable.Empty<MemberToCertify>(), Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
         clientMock.ReceivedCalls().Should().BeEmpty();
     }
@@ -38,12 +38,12 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
             "Hufiec",
-            new ZhpMember[]
+            new MemberToCertify[]
             {
                 new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"),
                 new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec")
             },
-            Enumerable.Empty<(ZhpMember, DateOnly)>());
+            Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
         var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
             .Body.As<MultipartAlternative>();
@@ -57,12 +57,12 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
             "Hufiec",
-            new ZhpMember[]
+            new MemberToCertify[]
             {
                 new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"),
                 new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec")
             },
-            Enumerable.Empty<(ZhpMember, DateOnly)>());
+            Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
         var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
             .Body.As<MultipartAlternative>();
@@ -77,8 +77,8 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
             "Hufiec",
-            Enumerable.Empty<ZhpMember>(),
-            new (ZhpMember, DateOnly)[]
+            Enumerable.Empty<MemberToCertify>(),
+            new (MemberToCertify, DateOnly)[]
             {
                 (new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec"), new(2023, 10, 02)),
                 (new("Anna", "Nowak", "AA03", "hufiec@zhp.example.com", "Hufiec"), new(2023, 12, 02))
@@ -98,8 +98,8 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             "hufiec@zhp.example.com",
             "Hufiec",
-            new ZhpMember[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec") },
-            Enumerable.Empty<(ZhpMember, DateOnly)>());
+            new MemberToCertify[] { new("Jan", "Kowalski", "AA02", "hufiec@zhp.example.com", "Hufiec") },
+            Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
         clientMock.ReceivedCalls().Single().GetArguments().First().Should().BeOfType<MimeMessage>()
             .Which.To.Mailboxes.Should().ContainSingle(m => m.Address == "overriden@example.zhp.pl");
