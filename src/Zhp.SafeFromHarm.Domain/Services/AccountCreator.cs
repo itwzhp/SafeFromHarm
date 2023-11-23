@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Runtime.CompilerServices;
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 using Zhp.SafeFromHarm.Domain.Model;
@@ -13,29 +13,39 @@ public class AccountCreator(
     IMembersFetcher membersFetcher,
     IMemberMailAccountChecker mailChecker,
     IAccountCreator creator,
-    IAccountCreationResultPublisher publisher)
+    IEnumerable<IAccountCreationResultPublisher> publishers)
 {
-    public async IAsyncEnumerable<AccountCreationResult> CreateAccounts(IEnumerable<Member> members, string requestorEmail, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<AccountCreationResult>> CreateAccounts(IEnumerable<Member> members, string requestorEmail, CancellationToken cancellationToken)
     {
-        foreach (var member in members)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            AccountCreationResult result;
-            try
-            {
-                result = await CreateAccount(member, requestorEmail, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Unable to create account for member {membershipId}: {message}", member.MembershipNumber, ex.Message);
-                result = new(member, null, AccountCreationResult.ResultType.OtherError);
-            }
+        var result = new ConcurrentBag<AccountCreationResult>();
 
-            yield return result;
-        }
+        await Parallel.ForEachAsync(
+            members,
+            new ParallelOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 4
+            }, 
+            async (member, cancellationToken) =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                try
+                {
+                    result.Add(await CreateAccount(member, cancellationToken));
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Unable to create account for member {membershipId}: {message}", member.MembershipNumber, ex.Message);
+                    result.Add(new(member, null, AccountCreationResult.ResultType.OtherError));
+                }
+            });
+
+        await Task.WhenAll(publishers.Select(async p => await p.PublishResult(result, requestorEmail)));
+
+        return result;
     }
 
-    private async Task<AccountCreationResult> CreateAccount(Member member, string requestorEmail, CancellationToken cancellationToken)
+    private async Task<AccountCreationResult> CreateAccount(Member member, CancellationToken cancellationToken)
     {
         var fetchedMember = await membersFetcher.GetMember(member.MembershipNumber, cancellationToken);
         if (fetchedMember != member)
@@ -50,12 +60,7 @@ public class AccountCreator(
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var result = new AccountCreationResult(member, password, await creator.CreateAccount(member, password));
-
-        if (result.Result == AccountCreationResult.ResultType.Success)
-            await publisher.PublishResult(result, requestorEmail);
-
-        return result;
+        return new AccountCreationResult(member, password, await creator.CreateAccount(member, password));
     }
 
     private string GeneratePassword()

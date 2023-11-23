@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using System.Net;
 using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Func.Adapters.Tipi;
@@ -143,17 +142,5 @@ public class TipiRequiredMembersFetcherTests
         var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
 
         result.Should().ContainSingle().Which.SupervisorEmail.Should().Be("hufiec@zhp.example.com");
-    }
-
-
-
-    private class TestHandler : HttpMessageHandler
-    {
-        public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
-
-        public string ResponseBody { get; set; } = string.Empty;
-
-        override protected Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            => Task.FromResult(new HttpResponseMessage(StatusCode) { Content = new StringContent(ResponseBody, System.Text.Encoding.UTF8, "application/json") });
     }
 }

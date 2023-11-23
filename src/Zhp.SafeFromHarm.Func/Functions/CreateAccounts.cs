@@ -17,7 +17,7 @@ public class CreateAccounts(ILogger<CreateAccounts> logger, AccountCreator creat
         var body = await JsonSerializer.DeserializeAsync<CreateAccountsContract>(req.Body)
             ?? throw new Exception("Null body");
 
-        var result = await creator.CreateAccounts(body.Members, body.RequestorEmail, req.FunctionContext.CancellationToken).ToListAsync();
+        var result = await creator.CreateAccounts(body.Members, body.RequestorEmail, req.FunctionContext.CancellationToken);
 
         logger.LogInformation("CreateAccounts Finished.");
 

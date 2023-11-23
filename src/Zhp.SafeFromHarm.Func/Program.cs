@@ -7,6 +7,7 @@ using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Services;
+using Zhp.SafeFromHarm.Func;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Smtp;
@@ -24,88 +25,95 @@ var host = new HostBuilder()
         services.AddOptions<SafeFromHarmOptions>()
             .BindConfiguration("SafeFromHarm")
             .Validate(sfh => sfh.CertificateExpiryDays > 0);
+
+        var adapterToggles = ctx.Configuration.GetSection("Toggles").Get<AdapterTogglesOptions>();
+        services
+            .AddAccountCreation(adapterToggles)
+            .AddAccountCreation(adapterToggles);
     })
     .ConfigureMoodleServices()
     .ConfigureSmtp()
     .ConfigureTipi()
-    .ConfigureAccountCreation()
-    .ConfigureCertificationNotifications()
     .Build();
 
 host.Run();
 
-static class RegistrationExtensions {
-    internal static IHostBuilder ConfigureAccountCreation(this IHostBuilder builder)
-        => builder.ConfigureServices((ctx, services) =>
-            {
-                services.AddTransient<AccountCreator>()
-                    .AddSingleton(s => RandomNumberGenerator.Create());
-
-                services.AddSwitch("AccountCreator", ctx, new()
-                {
-                    ["Moodle"] = s => throw new NotImplementedException("TODO"),
-                    ["Dummy"] = s => s.AddTransient<IAccountCreator, DummyAccountCreator>(),
-                });
-
-                services.AddSwitch("AccountCreationResultPublisher", ctx, new()
-                {
-                    ["Sharepoint"] = s => throw new NotImplementedException("TODO"),
-                    ["Dummy"] = s => s.AddTransient<IAccountCreationResultPublisher, DummyAccountCreationResultPublisher>(),
-                });
-
-                services.AddSwitch("MemberMailAccountChecker", ctx, new()
-                {
-                    ["Ms365"] = s => throw new NotImplementedException("TODO"),
-                    ["Dummy"] = s => s.AddTransient<IMemberMailAccountChecker, DummyMemberMailAccountChecker>(),
-                });
-
-                services.AddSwitch("MembersFetcher", ctx, new()
-                {
-                    ["Tipi"] = s => throw new NotImplementedException("TODO"),
-                    ["Dummy"] = s => s.AddTransient<IMembersFetcher, DummyMembersFetcher>(),
-                });
-            });
-
-    internal static IHostBuilder ConfigureCertificationNotifications(this IHostBuilder builder)
-        => builder.ConfigureServices((ctx, services) =>
-            {
-                services.AddTransient<MissingCertificationsNotifier>();
-
-                services.AddSwitch("CertifiedMembersFetcher", ctx, new()
-                {
-                    ["Dummy"] = s => s.AddTransient<ICertifiedMembersFetcher, DummyCertifiedMembersFetcher>(),
-                    ["Moodle"] = s => s.AddTransient<ICertifiedMembersFetcher, MoodleCertifiedMembersFetcher>(),
-                });
-
-                services.AddSwitch("EmailMembershipNumberMapper", ctx, new()
-                {
-                    ["Dummy"] = s => s.AddTransient<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>(),
-                    ["Moodle"] = s => s.AddSingleton<IEmailMembershipNumberMapper, MoodleEmailMembershipNumberMapper>(),
-                    ["Ms365"] = s => throw new NotImplementedException("Ms365 mail to membership number mapping not yet implemented"),
-                });
-
-                services.AddSwitch("RequiredMembersFetcher", ctx, new()
-                {
-                    ["Dummy"] = s => s.AddTransient<IRequiredMembersFetcher, DummyRequiredMembersFetcher>(),
-                    ["Tipi"] = s => s.AddTransient<IRequiredMembersFetcher, TipiRequiredMembersFetcher>(),
-                });
-
-                services.AddSwitch("NotificationSender", ctx, new()
-                {
-                    ["Dummy"] = s => s
-                                .AddTransient<INotificationSender, DummyNotificationSender>()
-                                .AddTransient<ISummarySender, DummySummarySender>(),
-                    ["Smtp"] = s => s
-                                .AddTransient<INotificationSender, SmtpNotificationSender>()
-                                .AddTransient<ISummarySender, SmtpSummarySender>(),
-                });
-            });
-
-    private static IServiceCollection AddSwitch(this IServiceCollection services, string key, HostBuilderContext ctx, Dictionary<string, Action<IServiceCollection>> registrations)
+file static class RegistrationExtensions {
+    internal static IServiceCollection AddAccountCreation(this IServiceCollection services, AdapterTogglesOptions toggles)
     {
-        var setting = ctx.Configuration[key] ?? string.Empty;
+        services.AddTransient<AccountCreator>()
+            .AddSingleton(s => RandomNumberGenerator.Create());
 
-        var action = registrations.GetValueOrDefault(setting, _ => throw new Exception($"Unknown {key} config value: {setting ?? "null"}"));
+        services.AddSwitch("AccountCreator", toggles.AccountCreator, new()
+        {
+            ["Moodle"] = s => throw new NotImplementedException("TODO"),
+            ["Dummy"] = s => s.AddTransient<IAccountCreator, DummyAccountCreator>(),
+        });
+
+        services.AddSwitch("MemberMailAccountChecker", toggles.MemberMailAccountChecker, new()
+        {
+            ["Ms365"] = s => throw new NotImplementedException("TODO"),
+            ["Dummy"] = s => s.AddTransient<IMemberMailAccountChecker, DummyMemberMailAccountChecker>(),
+        });
+
+        services.AddSwitch("MembersFetcher", toggles.MembersFetcher, new()
+        {
+            ["Tipi"] = s => s.AddTransient<IMembersFetcher, TipiMembersFetcher>(),
+            ["Dummy"] = s => s.AddTransient<IMembersFetcher, DummyMembersFetcher>(),
+        });
+
+        foreach (var publisher in toggles.AccountCreationResultPublishers)
+        {
+            _ = publisher switch
+            {
+                "Dummy" => services.AddTransient<IAccountCreationResultPublisher, DummyAccountCreationResultPublisher>(),
+                "Sharepoint" => throw new NotImplementedException("TODO"),
+                "Smtp" => services.AddTransient<IAccountCreationResultPublisher, SmtpAccountCreationResultPublisher>(),
+                _ => throw new Exception($"Unknown AccountCreationResultPublisher config value: {publisher ?? "null"}")
+            };
+        }
+        return services;
+    }
+
+    internal static IServiceCollection ConfigureCertificationNotifications(this IServiceCollection services, AdapterTogglesOptions toggles)
+    {
+        services.AddTransient<MissingCertificationsNotifier>();
+
+        services.AddSwitch("CertifiedMembersFetcher", toggles.CertifiedMembersFetcher, new()
+        {
+            ["Dummy"] = s => s.AddTransient<ICertifiedMembersFetcher, DummyCertifiedMembersFetcher>(),
+            ["Moodle"] = s => s.AddTransient<ICertifiedMembersFetcher, MoodleCertifiedMembersFetcher>(),
+        });
+
+        services.AddSwitch("EmailMembershipNumberMapper", toggles.EmailMembershipNumberMapper, new()
+        {
+            ["Dummy"] = s => s.AddTransient<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>(),
+            ["Moodle"] = s => s.AddSingleton<IEmailMembershipNumberMapper, MoodleEmailMembershipNumberMapper>(),
+            ["Ms365"] = s => throw new NotImplementedException("Ms365 mail to membership number mapping not yet implemented"),
+        });
+
+        services.AddSwitch("RequiredMembersFetcher", toggles.RequiredMembersFetcher, new()
+        {
+            ["Dummy"] = s => s.AddTransient<IRequiredMembersFetcher, DummyRequiredMembersFetcher>(),
+            ["Tipi"] = s => s.AddTransient<IRequiredMembersFetcher, TipiRequiredMembersFetcher>(),
+        });
+
+        services.AddSwitch("NotificationSender", toggles.NotificationSender, new()
+        {
+            ["Dummy"] = s => s
+                        .AddTransient<INotificationSender, DummyNotificationSender>()
+                        .AddTransient<ISummarySender, DummySummarySender>(),
+            ["Smtp"] = s => s
+                        .AddTransient<INotificationSender, SmtpNotificationSender>()
+                        .AddTransient<ISummarySender, SmtpSummarySender>(),
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection AddSwitch(this IServiceCollection services, string key, string? setting, Dictionary<string, Action<IServiceCollection>> registrations)
+    {
+        var action = registrations.GetValueOrDefault(setting ?? string.Empty, _ => throw new Exception($"Unknown {key} config value: {setting ?? "null"}"));
         action(services);
 
         return services;

@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
 using MimeKit;
 using System.Text;
-using System.Text.RegularExpressions;
 using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
-internal partial class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory) : INotificationSender
+internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory) : INotificationSender
 {
     private readonly SmtpOptions options = options.Value;
 
@@ -28,7 +27,7 @@ internal partial class SmtpNotificationSender(IOptions<SmtpOptions> options, ISm
 
         var bodyBuilder = new BodyBuilder
         {
-            TextBody = ClearHtml(html),
+            TextBody = SmtpHelper.ClearHtml(html),
             HtmlBody = html
         };
 
@@ -40,23 +39,6 @@ internal partial class SmtpNotificationSender(IOptions<SmtpOptions> options, ISm
 
         await client.SendAsync(mail);
     }
-
-    private static string ClearHtml(string html)
-    {
-        var clear = new StringBuilder(html)
-            .Replace("<br>", null)
-            .Replace("<p>", null).Replace("</p>", null)
-            .Replace("<ol>", null).Replace("</ol>", null)
-            .Replace("<ul>", null).Replace("</ul>", null)
-            .Replace("<strong>", null).Replace("</strong>", null)
-            .Replace("<li>", "- ").Replace("</li>", null)
-            .ToString();
-
-        return LinkRegex().Replace(clear, m => $"{m.Groups["text"]} ({m.Groups["url"]})");
-    }
-
-    [GeneratedRegex(@"<a href=""(?<url>[^""]+)"">(?<text>[^<]+)</a>")]
-    private static partial Regex LinkRegex();
 
     private static string BuildHtmlContent(List<MemberToCertify> missingCertificationMembers, List<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
     {

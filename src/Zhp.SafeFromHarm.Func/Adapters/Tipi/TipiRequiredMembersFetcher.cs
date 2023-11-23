@@ -44,7 +44,7 @@ internal class TipiRequiredMembersFetcher(HttpClient httpClient, IOptions<SafeFr
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for deserialization")]
-    public record ResultEntry(
+    private record ResultEntry(
         string memberId,
         string firstName,
         string lastName,

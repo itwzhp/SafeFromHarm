@@ -116,37 +116,37 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
 
         // ports for reports
         {
-          name: 'CertifiedMembersFetcher'
+          name: 'Toggles__CertifiedMembersFetcher'
           value: 'Moodle'
         }
         {
-          name: 'EmailMembershipNumberMapper'
+          name: 'Toggles__EmailMembershipNumberMapper'
           value: 'Moodle'
         }
         {
-          name: 'RequiredMembersFetcher'
+          name: 'Toggles__RequiredMembersFetcher'
           value: 'Tipi'
         }
         {
-          name: 'NotificationSender'
+          name: 'Toggles__NotificationSender'
           value: 'Smtp'
         }
 
         // ports for account creation
         {
-          name: 'AccountCreator'
+          name: 'Toggles__AccountCreator'
           value: 'Dummy'
         }
         {
-          name: 'AccountCreationResultPublisher'
+          name: 'Toggles__AccountCreationResultPublishers__0'
           value: 'Dummy'
         }
         {
-          name: 'MemberMailAccountChecker'
+          name: 'Toggles__MemberMailAccountChecker'
           value: 'Dummy'
         }
         {
-          name: 'MembersFetcher'
+          name: 'Toggles__MembersFetcher'
           value: 'Dummy'
         }
       ]
