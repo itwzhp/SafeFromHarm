@@ -19,7 +19,7 @@ internal class MoodleEmailMembershipNumberMapper(MoodleClient client, IOptions<M
 
     private async Task<IReadOnlyDictionary<string, string?>> BuildMap()
     {
-        var result = await client.CallMoodle<User[]>(MoodleFunctions.core_enrol_get_enrolled_users, ("courseid", options.SfhCourseId.ToString()));
+        var result = await client.CallMoodle<User[]>(MoodleFunctions.core_enrol_get_enrolled_users, new() { ["courseid"] = options.SfhCourseId });
         return result.ToDictionary(
             u => u.Email,
             u => u.CustomFields?.FirstOrDefault(f => f.ShortName == "numer_ewidencyjny")?.Value);

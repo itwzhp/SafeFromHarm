@@ -14,7 +14,7 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
     {
         var gradeResponse = await client.CallMoodle<GradeReport>(
             MoodleFunctions.gradereport_user_get_grade_items,
-            ("courseid", options.SfhCourseId.ToString()));
+            new() { ["courseid"] = options.SfhCourseId });
 
         var passingMembers = gradeResponse
             .UserGrades
@@ -25,7 +25,7 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
 
         var userResponse = await client.CallMoodle<User[]>(
             MoodleFunctions.core_enrol_get_enrolled_users,
-            ("courseid", options.SfhCourseId.ToString()));
+            new() { ["courseid"] = options.SfhCourseId });
 
         var eMailsById = userResponse.ToDictionary(u => u.Id, u => u.Email);
 

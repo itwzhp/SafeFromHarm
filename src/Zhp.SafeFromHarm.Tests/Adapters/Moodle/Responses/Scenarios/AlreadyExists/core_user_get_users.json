@@ -1,0 +1,31 @@
+{
+  "users": [
+    {
+      "id": 12729,
+      "username": "AAA01",
+      "fullname": "Jan Kowalski",
+      "department": "",
+      "firstaccess": 1700773592,
+      "lastaccess": 1700773592,
+      "auth": "manual",
+      "suspended": false,
+      "confirmed": true,
+      "lang": "pl",
+      "theme": "",
+      "timezone": "99",
+      "mailformat": 1,
+      "country": "PL",
+      "profileimageurlsmall": "https:\/\/edu.zhp.pl\/theme\/image.php\/boost\/core\/1675785359\/u\/f2",
+      "profileimageurl": "https:\/\/edu.zhp.pl\/theme\/image.php\/boost\/core\/1675785359\/u\/f1",
+      "customfields": [
+        {
+          "type": "text",
+          "value": "AAA01",
+          "name": "Numer Ewidencyjny",
+          "shortname": "numer_ewidencyjny"
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

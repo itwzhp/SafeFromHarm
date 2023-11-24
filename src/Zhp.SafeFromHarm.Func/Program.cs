@@ -46,7 +46,7 @@ file static class RegistrationExtensions {
 
         services.AddSwitch("AccountCreator", toggles.AccountCreator, new()
         {
-            ["Moodle"] = s => throw new NotImplementedException("TODO"),
+            ["Moodle"] = s => s.AddTransient<IAccountCreator, MoodleAccountCreator>(),
             ["Dummy"] = s => s.AddTransient<IAccountCreator, DummyAccountCreator>(),
         });
 

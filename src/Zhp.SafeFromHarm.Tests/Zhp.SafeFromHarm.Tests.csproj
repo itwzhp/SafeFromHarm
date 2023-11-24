@@ -38,7 +38,7 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <None Update="Adapters\Moodle\Responses\*.json">
+    <None Update="Adapters\Moodle\Responses\**\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
