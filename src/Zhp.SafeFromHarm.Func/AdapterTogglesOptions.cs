@@ -9,7 +9,7 @@ internal class AdapterTogglesOptions
 
     public string MembersFetcher { get; init; } = string.Empty;
 
-    public string[] AccountCreationResultPublishers { get; init; } = Array.Empty<string>();
+    public string[] AccountCreationResultPublishers { get; init; } = [];
 
     // Certification notifications
 

@@ -8,6 +8,7 @@ using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Services;
 using Zhp.SafeFromHarm.Func;
+using Zhp.SafeFromHarm.Func.Adapters.GraphApi;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Smtp;
@@ -26,7 +27,7 @@ var host = new HostBuilder()
             .BindConfiguration("SafeFromHarm")
             .Validate(sfh => sfh.CertificateExpiryDays > 0);
 
-        var adapterToggles = ctx.Configuration.GetSection("Toggles").Get<AdapterTogglesOptions>();
+        var adapterToggles = ctx.Configuration.GetSection("Toggles").Get<AdapterTogglesOptions>() ?? new();
         services
             .AddAccountCreation(adapterToggles)
             .AddAccountCreation(adapterToggles);
@@ -34,6 +35,7 @@ var host = new HostBuilder()
     .ConfigureMoodleServices()
     .ConfigureSmtp()
     .ConfigureTipi()
+    .ConfigureGraphApi()
     .Build();
 
 host.Run();

@@ -155,6 +155,9 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
     }
     httpsOnly: true
   }
+  identity:{
+    type: 'SystemAssigned'
+  }
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
