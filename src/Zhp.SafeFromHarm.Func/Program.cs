@@ -19,6 +19,7 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureAppConfiguration((ctx, config)
         => config
+            .AddJsonFile($"appsettings.json", optional: false, reloadOnChange: false)
             .AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: false)
             .AddUserSecrets(Assembly.GetExecutingAssembly()))
     .ConfigureServices((ctx, services) =>
@@ -54,7 +55,7 @@ file static class RegistrationExtensions {
 
         services.AddSwitch("MemberMailAccountChecker", toggles.MemberMailAccountChecker, new()
         {
-            ["Ms365"] = s => throw new NotImplementedException("TODO"),
+            ["Ms365"] = s => s.AddTransient<IMemberMailAccountChecker, EntraIdMemberMailAccountChecker>(),
             ["Dummy"] = s => s.AddTransient<IMemberMailAccountChecker, DummyMemberMailAccountChecker>(),
         });
 
@@ -69,7 +70,7 @@ file static class RegistrationExtensions {
             _ = publisher switch
             {
                 "Dummy" => services.AddTransient<IAccountCreationResultPublisher, DummyAccountCreationResultPublisher>(),
-                "Sharepoint" => throw new NotImplementedException("TODO"),
+                "Sharepoint" => services.AddTransient<IAccountCreationResultPublisher, SharepointAccountCreationResultPublisher>(),
                 "Smtp" => services.AddTransient<IAccountCreationResultPublisher, SmtpAccountCreationResultPublisher>(),
                 _ => throw new Exception($"Unknown AccountCreationResultPublisher config value: {publisher ?? "null"}")
             };
