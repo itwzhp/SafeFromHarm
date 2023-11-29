@@ -1,4 +1,4 @@
-﻿namespace Zhp.SafeFromHarm.Func;
+﻿namespace Zhp.SafeFromHarm.Func.Infrastructure;
 
 internal class AdapterTogglesOptions
 {
