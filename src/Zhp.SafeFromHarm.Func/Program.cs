@@ -14,6 +14,7 @@ using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Smtp;
 using Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 using Zhp.SafeFromHarm.Func.Adapters.Tipi;
+using Zhp.SafeFromHarm.Func.Functions;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -31,15 +32,24 @@ var host = new HostBuilder()
         var adapterToggles = ctx.Configuration.GetSection("Toggles").Get<AdapterTogglesOptions>() ?? new();
         services
             .AddAccountCreation(adapterToggles)
-            .AddAccountCreation(adapterToggles);
+            .AddCertificationNotifications(adapterToggles);
 
-        services.AddTransient<PasswordGenerator>();
+        services
+            .AddTransient<PasswordGenerator>()
+            .AddTransient<CreateAccounts>()
+            .AddTransient<FindMissingRequiredCertifications>();
     })
     .ConfigureMoodleServices()
     .ConfigureSmtp()
-    .ConfigureTipi()
     .ConfigureGraphApi()
     .Build();
+
+if (host.Services.GetRequiredService<IHostEnvironment>().IsDevelopment())
+{
+    using var scope = host.Services.CreateScope();
+    _ = scope.ServiceProvider.GetRequiredService<CreateAccounts>();
+    _ = scope.ServiceProvider.GetRequiredService<FindMissingRequiredCertifications>();
+}
 
 host.Run();
 
@@ -63,7 +73,7 @@ file static class RegistrationExtensions {
 
         services.AddSwitch("MembersFetcher", toggles.MembersFetcher, new()
         {
-            ["Tipi"] = s => s.AddTransient<IMembersFetcher, TipiMembersFetcher>(),
+            ["Tipi"] = s => s.AddTipiMembersFetcher(),
             ["Dummy"] = s => s.AddTransient<IMembersFetcher, DummyMembersFetcher>(),
         });
 
@@ -80,7 +90,7 @@ file static class RegistrationExtensions {
         return services;
     }
 
-    internal static IServiceCollection ConfigureCertificationNotifications(this IServiceCollection services, AdapterTogglesOptions toggles)
+    internal static IServiceCollection AddCertificationNotifications(this IServiceCollection services, AdapterTogglesOptions toggles)
     {
         services.AddTransient<MissingCertificationsNotifier>();
 
@@ -100,7 +110,7 @@ file static class RegistrationExtensions {
         services.AddSwitch("RequiredMembersFetcher", toggles.RequiredMembersFetcher, new()
         {
             ["Dummy"] = s => s.AddTransient<IRequiredMembersFetcher, DummyRequiredMembersFetcher>(),
-            ["Tipi"] = s => s.AddTransient<IRequiredMembersFetcher, TipiRequiredMembersFetcher>(),
+            ["Tipi"] = s => s.AddTipiRequiredMembersFetcher(),
         });
 
         services.AddSwitch("NotificationSender", toggles.NotificationSender, new()

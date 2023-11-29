@@ -28,7 +28,7 @@ public class FindMissingRequiredCertifications(ILogger<FindMissingRequiredCertif
     }
 
     [Function("FindMissingRequiredCertificationsSchedule")]
-    public async Task RunSchedule([TimerTrigger("0 35 2 28 * *")] TimerInfo info, FunctionContext context)
+    public async Task RunSchedule([TimerTrigger("0 35 2 28 * *", RunOnStartup = true)] TimerInfo info, FunctionContext context)
     {
         logger.LogInformation("Starting FindMissingRequiredCertificationsSchedule");
 
