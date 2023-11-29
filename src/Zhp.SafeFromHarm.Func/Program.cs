@@ -32,6 +32,8 @@ var host = new HostBuilder()
         services
             .AddAccountCreation(adapterToggles)
             .AddAccountCreation(adapterToggles);
+
+        services.AddTransient<PasswordGenerator>();
     })
     .ConfigureMoodleServices()
     .ConfigureSmtp()

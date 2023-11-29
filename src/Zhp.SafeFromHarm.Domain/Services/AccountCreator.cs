@@ -8,7 +8,6 @@ using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 namespace Zhp.SafeFromHarm.Domain.Services;
 
 public class AccountCreator(
-    RandomNumberGenerator generator,
     ILogger<AccountCreator> logger,
     IMembersFetcher membersFetcher,
     IMemberMailAccountChecker mailChecker,
@@ -65,20 +64,9 @@ public class AccountCreator(
 
     private string GeneratePassword()
     {
-        const int length = 8;
-        // full alphanumeric ext. 0, l, I
-        const string easyChars = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-
-        byte[] byteBuffer = new byte[length];
-        generator.GetBytes(byteBuffer);
-        var password = new StringBuilder(length);
-
-        for (int i = 0; i < length; i++)
-        {
-            int randomValue = byteBuffer[i] % easyChars.Length;
-            password.Append(easyChars[randomValue]);
-        }
-
-        return password.ToString();
+        return "";
+        // TODO use password generator
+        // TODO test passwords from generator against moodle
+        // todo test flow
     }
 }
