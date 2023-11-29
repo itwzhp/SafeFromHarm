@@ -19,13 +19,13 @@ internal static class TipiHostBuilderExtensions
         where TClient : class
         where TImplementation : class, TClient
     {
+        services.AddOptions<TipiOptions>()
+            .BindConfiguration("Tipi")
+            .Validate(opt => !string.IsNullOrWhiteSpace(opt.TokenSecret))
+            .Validate(opt => !string.IsNullOrWhiteSpace(opt.TokenId));
+
         services.AddHttpClient<TClient, TImplementation>((provider, client) =>
         {
-            services.AddOptions<TipiOptions>()
-                .BindConfiguration("Tipi")
-                .Validate(opt => !string.IsNullOrWhiteSpace(opt.TokenSecret))
-                .Validate(opt => !string.IsNullOrWhiteSpace(opt.TokenId));
-
             var options = provider.GetRequiredService<IOptions<TipiOptions>>().Value;
 
             client.BaseAddress = options.BaseUrl;
