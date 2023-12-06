@@ -135,16 +135,16 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         // ports for account creation
         {
           name: 'Toggles__AccountCreator'
-          value: 'Dummy'
+          value: 'Moodle'
         }
         {
           name: 'Toggles__AccountCreationResultPublishers__0'
           value: 'Sharepoint'
         }
-        // {
-        //   name: 'Toggles__AccountCreationResultPublishers__1'
-        //   value: 'Smtp'
-        // }
+        {
+          name: 'Toggles__AccountCreationResultPublishers__1'
+          value: 'Smtp'
+        }
         {
           name: 'Toggles__MemberMailAccountChecker'
           value: 'Ms365'
