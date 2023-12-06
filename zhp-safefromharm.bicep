@@ -121,7 +121,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'Toggles__EmailMembershipNumberMapper'
-          value: 'Moodle'
+          value: 'Ms365'
         }
         {
           name: 'Toggles__RequiredMembersFetcher'

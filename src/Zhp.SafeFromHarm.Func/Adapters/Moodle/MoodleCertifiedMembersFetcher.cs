@@ -12,9 +12,20 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
 
     public async IAsyncEnumerable<CertifiedMember> GetCertifiedMembers()
     {
-        var gradeResponse = await client.CallMoodle<GradeReport>(
+        var gradeRequest = client.CallMoodle<GradeReport>(
             MoodleFunctions.gradereport_user_get_grade_items,
-            new() { ["courseid"] = options.SfhCourseId });
+            new() { ["courseid"] = options.SfhCourseId })
+            .AsTask();
+
+        var userRequest = client.CallMoodle<User[]>(
+            MoodleFunctions.core_enrol_get_enrolled_users,
+            new() { ["courseid"] = options.SfhCourseId })
+            .AsTask();
+
+        await Task.WhenAll(gradeRequest, userRequest);
+
+        var gradeResponse = gradeRequest.Result;
+        var userResponse = userRequest.Result;
 
         var passingMembers = gradeResponse
             .UserGrades
@@ -22,10 +33,6 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
             .Where(g => g.Grade is not null)
             .Where(g => g.Grade?.GradeRaw != null && g.Grade?.GradeDateTime != null)
             .Select(g => (g.UserId, g.Grade!.GradeDateTime!.Value));
-
-        var userResponse = await client.CallMoodle<User[]>(
-            MoodleFunctions.core_enrol_get_enrolled_users,
-            new() { ["courseid"] = options.SfhCourseId });
 
         var eMailsById = userResponse.ToDictionary(u => u.Id, u => u.Email);
 

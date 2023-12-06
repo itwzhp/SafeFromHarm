@@ -1,11 +1,13 @@
-﻿using Zhp.SafeFromHarm.Domain.Model;
+﻿using Microsoft.Extensions.Options;
+using Zhp.SafeFromHarm.Domain;
+using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Moodle;
 
-internal class MoodleAccountCreator(MoodleClient client) : IAccountCreator
+internal class MoodleAccountCreator(MoodleClient client, IOptions<SafeFromHarmOptions> options) : IAccountCreator
 {
     public async Task<AccountCreationResult.ResultType> CreateAccount(Member member, string password)
     {
@@ -25,7 +27,7 @@ internal class MoodleAccountCreator(MoodleClient client) : IAccountCreator
             ["users[0][username]"] = username,
             ["users[0][firstname]"] = member.FirstName,
             ["users[0][lastname]"] = member.LastName,
-            ["users[0][email]"] = $"{member.MembershipNumber}@sfh.fake-mail.zhp.pl",
+            ["users[0][email]"] = $"{member.MembershipNumber}@{options.Value.MoodleAccountMailFakeDomain}",
             ["users[0][password]"] = password,
             ["users[0][customfields][0][type]"] = "numer_ewidencyjny",
             ["users[0][customfields][0][value]"] = member.MembershipNumber,

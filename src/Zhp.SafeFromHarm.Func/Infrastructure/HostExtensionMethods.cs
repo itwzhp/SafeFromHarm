@@ -107,7 +107,7 @@ public static class HostExtensionMethods
         {
             ["Dummy"] = s => s.AddTransient<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>(),
             ["Moodle"] = s => s.AddSingleton<IEmailMembershipNumberMapper, MoodleEmailMembershipNumberMapper>(),
-            ["Ms365"] = s => throw new NotImplementedException("Ms365 mail to membership number mapping not yet implemented"),
+            ["Ms365"] = s => s.AddSingleton<IEmailMembershipNumberMapper, EntraIdEmailMembershipNumberMapper>(),
         });
 
         services.AddSwitch("RequiredMembersFetcher", toggles.RequiredMembersFetcher, new()
