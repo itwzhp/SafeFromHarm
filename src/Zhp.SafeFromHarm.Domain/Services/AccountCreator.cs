@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using System.Security.Cryptography;
 using System.Text;
 using Zhp.SafeFromHarm.Domain.Model;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
@@ -12,7 +11,8 @@ public class AccountCreator(
     IMembersFetcher membersFetcher,
     IMemberMailAccountChecker mailChecker,
     IAccountCreator creator,
-    IEnumerable<IAccountCreationResultPublisher> publishers)
+    IEnumerable<IAccountCreationResultPublisher> publishers,
+    PasswordGenerator generator)
 {
     public async Task<IReadOnlyCollection<AccountCreationResult>> CreateAccounts(IEnumerable<Member> members, string requestorEmail, CancellationToken cancellationToken)
     {
@@ -44,29 +44,21 @@ public class AccountCreator(
         return result;
     }
 
-    private async Task<AccountCreationResult> CreateAccount(Member member, CancellationToken cancellationToken)
+    private async Task<AccountCreationResult> CreateAccount(Member requestedMember, CancellationToken cancellationToken)
     {
-        var fetchedMember = await membersFetcher.GetMember(member.MembershipNumber, cancellationToken);
-        if (fetchedMember != member)
-            return new(member, null, AccountCreationResult.ResultType.MemberNotInTipi);
+        var fetchedMember = await membersFetcher.GetMember(requestedMember.MembershipNumber, cancellationToken);
+        if (fetchedMember != requestedMember)
+            return new(requestedMember, null, AccountCreationResult.ResultType.MemberNotInTipi);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (await mailChecker.HasEmailAccount(member.MembershipNumber, cancellationToken))
-            return new(member, null, AccountCreationResult.ResultType.MemberHasMs365);
+        if (await mailChecker.HasEmailAccount(requestedMember.MembershipNumber, cancellationToken))
+            return new(requestedMember, null, AccountCreationResult.ResultType.MemberHasMs365);
 
-        var password = GeneratePassword();
+        var password = generator.GeneratePassword();
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        return new AccountCreationResult(member, password, await creator.CreateAccount(member, password));
-    }
-
-    private string GeneratePassword()
-    {
-        return "";
-        // TODO use password generator
-        // TODO test passwords from generator against moodle
-        // todo test flow
+        return new AccountCreationResult(requestedMember, password, await creator.CreateAccount(fetchedMember, password));
     }
 }

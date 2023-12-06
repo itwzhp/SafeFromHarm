@@ -139,15 +139,19 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'Toggles__AccountCreationResultPublishers__0'
-          value: 'Dummy'
+          value: 'Sharepoint'
         }
+        // {
+        //   name: 'Toggles__AccountCreationResultPublishers__1'
+        //   value: 'Smtp'
+        // }
         {
           name: 'Toggles__MemberMailAccountChecker'
-          value: 'Dummy'
+          value: 'Ms365'
         }
         {
           name: 'Toggles__MembersFetcher'
-          value: 'Dummy'
+          value: 'Tipi'
         }
       ]
       ftpsState: 'FtpsOnly'
