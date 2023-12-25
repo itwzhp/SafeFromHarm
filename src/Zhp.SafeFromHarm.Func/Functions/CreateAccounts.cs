@@ -10,7 +10,7 @@ namespace Zhp.SafeFromHarm.Func.Functions;
 public class CreateAccounts(ILogger<CreateAccounts> logger, AccountCreator creator)
 {
     [Function("CreateAccounts")]
-    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
         logger.LogInformation("Starting CreateAccounts");
 

@@ -5,6 +5,8 @@ Ta funkcja pozwala na założenie kont w Moodle dla użytkowników, którzy nie 
 
 Do funkcji przesyła się listę osób do założenia konta (imię, nazwisko i nr ewidencji). Jeśli dane spełniają wymagane krytera - zakładane są konta i zwracane hasła. Jeśli nie - zwracana jest przyczyna błędu.
 
+Funkcja ta jest wołana przez frontend i wymaga uwierzytelnienia przez Entra ID
+
 ## Missing certification notifier
 Ta funkcja służy do poinformowania jednostek, kto powinien przejść certyfikację i czy już przeszedł. Osoby z przydziałem do hufca i niżej są opisani w raporcie dla hufca, osoby z przydziałem do GK-i lub chorągwi odpowiednio do swojej jednostki
 

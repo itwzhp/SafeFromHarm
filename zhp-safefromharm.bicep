@@ -174,6 +174,20 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   identity:{
     type: 'SystemAssigned'
   }
+
+  resource corsSettings 'config' = {
+    name: 'web'
+    properties: {
+      cors: {
+        allowedOrigins: [
+          'https://portal.azure.com'
+          'http://localhost:5000'
+          'https://konta-sfh.zhp.pl'
+        ]
+        supportCredentials: true
+      }
+    }
+  }
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {

@@ -1,0 +1,13 @@
+{
+  "name": "zhp-sfh",
+  "version": "1.0.0",
+  "description": "Safe from Harm",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server ./src --port 5000 -c-1"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^0.12.3"
+  }
+}
