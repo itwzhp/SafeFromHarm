@@ -144,7 +144,7 @@ $(function () {
                             <tr>
                                 <td>${result.Member.FirstName} ${result.Member.LastName}</td>
                                 <td>${description}</td>
-                                <td>${result.Password || ''}</td>
+                                <td>${result.Member.MembershipNumber} / ${result.Password || ''}</td>
                             </tr>
                         `);
                     });
