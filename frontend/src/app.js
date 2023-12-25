@@ -70,6 +70,15 @@ $(function () {
     });
 
     $('#create-accounts').click(function () {
+        const inputs = $('#users-form input');
+        const emptyInputs = inputs.filter(function() { return this.value == ""; });
+
+        inputs.removeClass('is-invalid');
+        emptyInputs.addClass('is-invalid');
+
+        if(emptyInputs.length !== 0)
+            return;
+
         $('#logged-in').hide();
         $('#sending').show();
 
