@@ -183,6 +183,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           'https://portal.azure.com'
           'http://localhost:5000'
           'https://konta-sfh.zhp.pl'
+          'https://konta-sfh.pages.dev/'
         ]
         supportCredentials: true
       }
