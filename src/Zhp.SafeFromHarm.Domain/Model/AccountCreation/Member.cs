@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Zhp.SafeFromHarm.Domain.Model;
+namespace Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 
 public record Member(string FirstName, string LastName, string MembershipNumber)
 {

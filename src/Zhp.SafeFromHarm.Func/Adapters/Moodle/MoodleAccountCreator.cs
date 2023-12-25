@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Zhp.SafeFromHarm.Domain;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;

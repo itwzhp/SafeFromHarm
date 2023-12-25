@@ -1,4 +1,4 @@
-﻿using Zhp.SafeFromHarm.Domain.Model;
+﻿using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 

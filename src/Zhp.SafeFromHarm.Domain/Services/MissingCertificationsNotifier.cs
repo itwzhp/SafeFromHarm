@@ -41,10 +41,10 @@ public class MissingCertificationsNotifier(
         var uncertifiedCount = membersWithCertInformation.Count(m => m.certificationDate == null);
 
         if (onlySendToEmail != null)
-            membersWithCertInformation = membersWithCertInformation.Where(m => m.member.SupervisorEmail == onlySendToEmail).ToList();
+            membersWithCertInformation = membersWithCertInformation.Where(m => m.member.Supervisor.Email == onlySendToEmail).ToList();
 
         var notificationsToSend = membersWithCertInformation
-            .GroupBy(m => (m.member.SupervisorEmail, m.member.SupervisorUnitName));
+            .GroupBy(m => m.member.Supervisor);
 
         var failedRecipients = new List<(string Email, string UnitName)>();
 
@@ -60,12 +60,12 @@ public class MissingCertificationsNotifier(
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
             try
             {
-                await sender.NotifySupervisor(notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName, missingCertificationMembers, certified);
+                await sender.NotifySupervisor(notification.Key.Email, notification.Key.Name, missingCertificationMembers, certified);
             }
             catch(Exception ex)
             {
-                logger.LogError(ex, "Unable to send message to {unit} <{email}>", notification.Key.SupervisorUnitName, notification.Key.SupervisorEmail);
-                failedRecipients.Add((notification.Key.SupervisorEmail, notification.Key.SupervisorUnitName));
+                logger.LogError(ex, "Unable to send message to {unit} <{email}>", notification.Key.Name, notification.Key.Email);
+                failedRecipients.Add((notification.Key.Email, notification.Key.Name));
             }
         }
 
