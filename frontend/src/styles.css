@@ -1,0 +1,63 @@
+/* .navbar {
+    background-color: #86a315;
+} */
+
+@font-face {
+    font-family: 'Museo';
+    src: url('/fonts/Museo300-Regular.woff2') format('woff2'),
+        url('/fonts/Museo300-Regular.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+.step {
+    display: none;
+}
+
+:root {
+    --bs-primary: #86a315;
+    --bs-primary-rgb: 134, 163, 21;
+    --bs-primary-contrast-color: #ffffff;
+
+    --bs-navbar-brand-hover-color: #ffffff;
+    --bs-navbar-brand-color: #ffffff;
+}
+
+.navbar span {
+    color: #ffffff;
+}
+
+.navbar span:hover {
+    color: #ffffff;
+}
+
+body {
+    font-family: 'Museo', 'Trebuchet MS', sans-serif;
+}
+
+.btn-success {
+    background-color: #86a315;
+    border-color: #86a315;
+}
+
+.btn-success:hover {
+    background-color: #587d18;
+}
+
+.btn-success:active {
+    background-color: #afca0b;
+}
+
+.btn-primary {
+    background-color: #252e78;
+    border-color: #252e78;
+}
+
+.btn-primary:hover {
+    background-color: #194093;
+}
+
+.btn-primary:active {
+    background-color: #194093;
+}

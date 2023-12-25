@@ -41,7 +41,7 @@ $(function () {
                 // Login success
                 $('#logged-out').hide();
                 $('#logged-in').show();
-                $('#logged-as').text(`${response.account.name} (${response.account.username})`);
+                $('#logged-as').text(`Zalogowano jako: ${response.account.name} (${response.account.username})`);
                 console.log(response);
                 myMsalObj.setActiveAccount(response.account);
             })
@@ -52,17 +52,17 @@ $(function () {
         const num = $('#users-form .row:last').data('num') + 1;
 
         $('#users-form').append(`
-            <div class="row"  data-num="${num}">
+            <div class="row mb-4"  data-num="${num}">
                 <div class="col">
-                    <label for="firstname-${num}" class="form-label">Imię</label>
+                    <label for="firstname-${num}" class="form-label text-body-secondary">Imię</label>
                     <input type="input" class="form-control" id="firstname-${num}" required>
                 </div>
                 <div class="col">
-                    <label for="lastname-${num}" class="form-label">Nazwisko</label>
+                    <label for="lastname-${num}" class="form-label text-body-secondary">Nazwisko</label>
                     <input type="input" class="form-control" id="lastname-${num}" required>
                 </div>
                 <div class="col">
-                    <label for="number-${num}" class="form-label">Numer ewidencyjny</label>
+                    <label for="number-${num}" class="form-label text-body-secondary">Numer ewidencyjny</label>
                     <input type="input" class="form-control" id="number-${num}" required>
                 </div>
             </div>
