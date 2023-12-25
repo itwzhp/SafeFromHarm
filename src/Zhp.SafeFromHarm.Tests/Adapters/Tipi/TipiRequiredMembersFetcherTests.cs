@@ -35,9 +35,12 @@ public class TipiRequiredMembersFetcherTests
             	"firstName": "Jan",
             	"lastName": "Kowalski",
             	"birthdate": 1408744800,
-            	"allocationUnitName": "Hufiec Radomsko",
-            	"allocationUnitContactEmails": "radomsko@zhp.pl",
-            	"memberRoles": "skarbnik"
+                "allocationUnitName": "Hufiec Radomsko",
+                "allocationUnitId": 2657,
+                "allocationUnitContactEmails": "radomsko@zhp.pl",
+                "memberRoles": "drużynowy",
+                "hufiecId": 2657,
+                "choragiewId": 2031
             },
             {
             	"memberId": "AA02",
@@ -45,9 +48,12 @@ public class TipiRequiredMembersFetcherTests
             	"firstName": "Anna",
             	"lastName": "Malinowska",
             	"birthdate": 1374962400,
-            	"allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
-            	"allocationUnitContactEmails": "cieszyn@zhp.pl",
-            	"memberRoles": "członek referatu nieprzetartego szlaku"
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
+                "allocationUnitContactEmails": "cieszyn@zhp.pl",
+                "memberRoles": "członek zespołu promocji i informacji hufca",
+                "hufiecId": 6127,
+                "choragiewId": 5967
             }
         ]
         """;
@@ -61,7 +67,7 @@ public class TipiRequiredMembersFetcherTests
             new("Anna", "Malinowska", "AA02", "cieszyn@zhp.pl", "Hufiec Ziemi Cieszyńskiej"),
         });
     }
-    
+
     [Fact]
     public async Task DuplicateMail_TakesFirst()
     {
@@ -73,9 +79,12 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Jan",
         	    "lastName": "Kowalski",
         	    "birthdate": -446086800,
-        	    "allocationUnitName": "Chorągiew Dolnośląska",
-        	    "allocationUnitContactEmails": "choragiew@dolnoslaska.zhp.pl;dolnoslaska@zhp.pl",
-        	    "memberRoles": null
+                "allocationUnitName": "Chorągiew Śląska",
+                "allocationUnitId": 5967,
+                "allocationUnitContactEmails": "choragiew@dolnoslaska.zhp.pl;biuro@slaska.zhp.pl",
+                "memberRoles": null,
+                "hufiecId": null,
+                "choragiewId": 5967
             }
         ]
         """;
@@ -97,9 +106,12 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
-        	    "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
-        	    "allocationUnitContactEmails": null,
-        	    "memberRoles": null
+                "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
+                "allocationUnitId": 20006,
+                "allocationUnitContactEmails": null,
+                "memberRoles": null,
+                "hufiecId": 20006,
+                "choragiewId": 5
             }
         ]
         """;
@@ -121,9 +133,12 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
-        	    "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
-        	    "allocationUnitContactEmails": null,
-        	    "memberRoles": null
+                "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
+                "allocationUnitId": 20006,
+                "allocationUnitContactEmails": null,
+                "memberRoles": null,
+                "hufiecId": 20006,
+                "choragiewId": 5
             },
             {
         	    "memberId": "BD2",
@@ -131,9 +146,12 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
-        	    "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
-        	    "allocationUnitContactEmails": "hufiec@zhp.example.com",
-        	    "memberRoles": null
+                "allocationUnitName": "Hufiec ZHP Powiatu Milickiego",
+                "allocationUnitId": 20006,
+                "allocationUnitContactEmails": "hufiec@zhp.example.com",
+                "memberRoles": null,
+                "hufiecId": 20006,
+                "choragiewId": 5
             }
         ]
         """;

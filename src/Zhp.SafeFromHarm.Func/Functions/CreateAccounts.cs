@@ -14,8 +14,14 @@ public class CreateAccounts(ILogger<CreateAccounts> logger, AccountCreator creat
     {
         logger.LogInformation("Starting CreateAccounts");
 
+        var principal = req.Headers.GetValues("X-MS-CLIENT-PRINCIPAL-NAME").FirstOrDefault()
+            ?? throw new Exception("Missing X-MS-CLIENT-PRINCIPAL-NAME header");
+
         var body = await JsonSerializer.DeserializeAsync<CreateAccountsContract>(req.Body)
             ?? throw new Exception("Null body");
+
+        if(!body.RequestorEmail.Equals(principal, StringComparison.OrdinalIgnoreCase))
+            throw new Exception("RequestorEmail does not match principal");
 
         var result = await creator.CreateAccounts(body.Members, body.RequestorEmail, req.FunctionContext.CancellationToken);
 

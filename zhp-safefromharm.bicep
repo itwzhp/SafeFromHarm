@@ -20,6 +20,10 @@ param smtpPassword string
 @secure()
 param controlTeamsChannelMail string
 
+@minLength(1)
+@secure()
+param microsoftProviderSecret string
+
 var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
@@ -80,6 +84,14 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: '0'
+        }
+        {
+            name: 'WEBSITE_ENABLE_SYNC_UPDATE_SITE'
+            value: 'true'
+        }
+        {
+            name: 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+            value: microsoftProviderSecret
         }
         {
           name: 'Tipi__TokenId'
