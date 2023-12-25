@@ -1,4 +1,3 @@
-
 /// based on https://github.com/jannehansen/SinglePageAndAAD/blob/master/functioncall
 
 // MSAL configuration
