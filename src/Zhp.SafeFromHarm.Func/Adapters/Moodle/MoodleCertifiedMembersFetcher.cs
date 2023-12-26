@@ -10,7 +10,7 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
 {
     private readonly MoodleOptions options = options.Value;
 
-    public async IAsyncEnumerable<CertifiedMember> GetCertifiedMembers()
+    public async IAsyncEnumerable<Certification> GetCertifiedMembers()
     {
         var gradeRequest = client.CallMoodle<GradeReport>(
             MoodleFunctions.gradereport_user_get_grade_items,

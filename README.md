@@ -1,5 +1,6 @@
 ﻿# Opis
 To jest aplikacja wspierająca wdrażanie polityki Safe from Harm w ZHP, w szczególności informowanie o postępach.
+
 ## Account Creator (w trakcie tworzenia)
 Ta funkcja pozwala na założenie kont w Moodle dla użytkowników, którzy nie mają konta ZHP. Dedykowana jest głównie seniorom, którzy przechodzą szkolenie na miejscu i zdają egzamin na komputerze hufca lub chorągwi
 
@@ -13,4 +14,4 @@ Ta funkcja służy do poinformowania jednostek, kto powinien przejść certyfika
 Funkcja jest uruchamiana raz na miesiąc (28 dzień miesiąca). Można też uruchomić ją ręcznie triggerem HTTP. Poprzez trigger należy przekazać body `{"RecipientFilter": "*"}`, aby wysłać do wszystkich. Można też podać tam jakiegoś maila, aby wysłać tylko mail do jednej jednostki.
 
 # Rozwój i deployment
-Aplikacja jest napisana w Azure Functions w .NET 8. Wgranie zmiany na branch `master` automatycznie powoduje wgranie jej na produkcję
+Aplikacja jest napisana w Azure Functions w .NET 8. Wgranie zmiany na branch `master` automatycznie powoduje wgranie jej na produkcję. Za wdrożenie backendu odpowiada GitHub Actions, a frontendu - CloudFlare Pages.

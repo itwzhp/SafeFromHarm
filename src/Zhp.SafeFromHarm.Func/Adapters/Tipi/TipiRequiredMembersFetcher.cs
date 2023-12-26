@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System.Text.Json;
-using Zhp.SafeFromHarm.Domain;
+﻿using System.Text.Json;
 using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
@@ -34,15 +32,20 @@ internal class TipiRequiredMembersFetcher(
 
         int supervisorId = entry.hufiecId ?? entry.choragiewId;
 
-        var unit = await unitsFetcher.GetUnit(supervisorId);
-        if (unit == null)
+        var supervisor = await unitsFetcher.GetUnit(supervisorId);
+        if (supervisor == null)
+            return null;
+
+        var department = await unitsFetcher.GetUnit(entry.choragiewId);
+        if (department == null)
             return null;
 
         return new(
                 entry.firstName,
                 entry.lastName,
                 entry.memberId,
-                unit);
+                supervisor,
+                department);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for deserialization")]

@@ -5,8 +5,8 @@ namespace Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 
 internal class DummyCertifiedMembersFetcher : ICertifiedMembersFetcher
 {
-    public IAsyncEnumerable<CertifiedMember> GetCertifiedMembers()
-        => new CertifiedMember[]
+    public IAsyncEnumerable<Certification> GetCertifiedMembers()
+        => new Certification[]
         {
             new("jan.kowalski@zhp.example.com", DateOnly.FromDateTime(DateTime.Today).AddDays(-10)),
             new("t.nowak@zhp.example.com", DateOnly.FromDateTime(DateTime.Today).AddDays(-20)),

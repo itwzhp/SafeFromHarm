@@ -34,6 +34,11 @@ public class TipiRequiredMembersFetcherTests
                 "orgunitId": 20006,
                 "name": "Hufiec ZHP Powiatu Milickiego",
                 "primaryEmail": null
+            },
+            {
+                "orgunitId": 2031,
+                "name": "Chorągiew Łódzka",
+                "primaryEmail": "lodzka@zhp.pl"
             }
         ]
         """;
@@ -97,9 +102,9 @@ public class TipiRequiredMembersFetcherTests
 
         result.Should().BeEquivalentTo(new MemberToCertify[]
         {
-            new("Jan", "Kowalski", "AA01", new(2657, "Hufiec Radomsko", "radomsko@zhp.pl")),
-            new("Anna", "Malinowska", "AA02", new(6127, "Hufiec Ziemi Cieszyńskiej", "cieszyn@zhp.pl")),
-            new("Jan", "Kowalski", "AB123", new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl")),
+            new("Jan", "Kowalski", "AA01", new(2657, "Hufiec Radomsko", "radomsko@zhp.pl"), new(2031, "Chorągiew Łódzka", "lodzka@zhp.pl")),
+            new("Anna", "Malinowska", "AA02", new(6127, "Hufiec Ziemi Cieszyńskiej", "cieszyn@zhp.pl"), new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl")),
+            new("Jan", "Kowalski", "AB123", new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"), new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl")),
         });
     }
 
@@ -140,7 +145,7 @@ public class TipiRequiredMembersFetcherTests
         	    "birthdate": 1012518000,
                 "memberRoles": null,
                 "hufiecId": 20006,
-                "choragiewId": 5
+                "choragiewId": 5967
             }
         ]
         """;
@@ -164,7 +169,7 @@ public class TipiRequiredMembersFetcherTests
         	    "birthdate": 1012518000,
                 "memberRoles": null,
                 "hufiecId": 20006,
-                "choragiewId": 5
+                "choragiewId": 5967
             },
             {
         	    "memberId": "BD2",
@@ -174,7 +179,7 @@ public class TipiRequiredMembersFetcherTests
         	    "birthdate": 1012518000,
                 "memberRoles": null,
                 "hufiecId": 2657,
-                "choragiewId": 5
+                "choragiewId": 5967
             }
         ]
         """;
