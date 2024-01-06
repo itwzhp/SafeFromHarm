@@ -1,4 +1,4 @@
-﻿using Zhp.SafeFromHarm.Domain.Model;
+﻿using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 
 namespace Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.ResponseContracts;
@@ -10,7 +10,7 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
 {
     private readonly MoodleOptions options = options.Value;
 
-    public async IAsyncEnumerable<CertifiedMember> GetCertifiedMembers()
+    public async IAsyncEnumerable<Certification> GetCertifiedMembers()
     {
         var gradeRequest = client.CallMoodle<GradeReport>(
             MoodleFunctions.gradereport_user_get_grade_items,

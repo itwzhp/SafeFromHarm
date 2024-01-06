@@ -1,5 +1,5 @@
 ﻿using System.Security.Cryptography;
-using Zhp.SafeFromHarm.Domain.Services;
+using Zhp.SafeFromHarm.Domain.Helpers;
 
 namespace Zhp.SafeFromHarm.Tests.Services;
 

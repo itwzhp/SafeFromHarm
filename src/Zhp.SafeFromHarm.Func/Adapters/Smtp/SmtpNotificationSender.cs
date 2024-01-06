@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MimeKit;
 using System.Text;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
@@ -14,7 +14,7 @@ internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClient
     {
         var membersToCertify = missingCertificationMembers.ToList();
         var certifiedMemebersList = certifiedMembers.ToList();
-        if (!membersToCertify.Any() && !certifiedMemebersList.Any())
+        if (membersToCertify.Count == 0 && certifiedMemebersList.Count == 0)
             return;
 
         var client = await clientFactory.GetClient();
@@ -44,7 +44,7 @@ internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClient
     {
         var b = new StringBuilder("Czuwaj,<br>\n");
 
-        if (missingCertificationMembers.Any())
+        if (missingCertificationMembers.Count != 0)
         {
             b.AppendLine("""
                 Oto lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>nie ukończyli</strong> obowiązkowego szkolenia z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych, a tym samym nie posiadają ważnego certyfikatu "Safe From Harm":
@@ -61,7 +61,7 @@ internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClient
                     """);
         }
 
-        if(certifiedMembers.Any())
+        if(certifiedMembers.Count != 0)
         {
             b.AppendLine("""
                 Poniżej znajduje się lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>ukończyli</strong> obowiązkowe szkolenie:

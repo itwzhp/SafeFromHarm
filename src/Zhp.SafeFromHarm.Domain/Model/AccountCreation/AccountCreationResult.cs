@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Zhp.SafeFromHarm.Domain.Model;
+namespace Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 
 public record AccountCreationResult(Member Member, string? Password, AccountCreationResult.ResultType Result)
 {

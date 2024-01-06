@@ -1,4 +1,4 @@
-﻿using Zhp.SafeFromHarm.Domain.Model;
+﻿using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Func.Adapters.Tipi;
 
 namespace Zhp.SafeFromHarm.Tests.Adapters.Tipi;
@@ -16,7 +16,7 @@ public class TipiMembersFetcherTests
     [Fact]
     public async Task GetMember_ExistingMember_ProperResult()
     {
-        httpHandler.ResponseBody = """
+        httpHandler.ResponseBody["/memberdetails/AA123"] = """
         {
         	"memberId": "AA123",
         	"personId": 112233,
@@ -43,7 +43,7 @@ public class TipiMembersFetcherTests
     public async Task GetMember_NotExistingMember_Null()
     {
         httpHandler.StatusCode = System.Net.HttpStatusCode.NotFound;
-        httpHandler.ResponseBody = """
+        httpHandler.ResponseBody["/memberdetails/AA123"] = """
         {
         	"detail": "Member not found"
         }
@@ -57,7 +57,7 @@ public class TipiMembersFetcherTests
     [Fact]
     public async Task GetMember_NotActiveMember_Null()
     {
-        httpHandler.ResponseBody = """
+        httpHandler.ResponseBody["/memberdetails/AA123"] = """
         {
         	"memberId": "AA123",
         	"personId": 112233,

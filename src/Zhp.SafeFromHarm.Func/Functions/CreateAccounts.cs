@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Services;
 
 namespace Zhp.SafeFromHarm.Func.Functions;

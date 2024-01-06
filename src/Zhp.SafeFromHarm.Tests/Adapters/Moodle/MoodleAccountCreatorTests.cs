@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Zhp.SafeFromHarm.Domain;
+using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle.Infrastructure;
 
@@ -26,7 +27,7 @@ public class MoodleAccountCreatorTests
 
         var result = await subject.CreateAccount(new("Jan", "Kowalski", "AAA01"), "TajneHaslo");
 
-        result.Should().Be(Domain.Model.AccountCreationResult.ResultType.Success);
+        result.Should().Be(AccountCreationResult.ResultType.Success);
     }
 
     [Fact]
@@ -36,6 +37,6 @@ public class MoodleAccountCreatorTests
 
         var result = await subject.CreateAccount(new("Jan", "Kowalski", "AAA01"), "TajneHaslo");
 
-        result.Should().Be(Domain.Model.AccountCreationResult.ResultType.MemberAlreadyHasMoodle);
+        result.Should().Be(AccountCreationResult.ResultType.MemberAlreadyHasMoodle);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Zhp.SafeFromHarm.Domain.Model;
+﻿using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Func.Adapters.Moodle;
 
@@ -13,7 +13,7 @@ public class MoodleCertifiedMembersFetcherTests
     {
         var result = subject.GetCertifiedMembers();
 
-        (await result.ToListAsync()).Should().BeEquivalentTo(new CertifiedMember[]
+        (await result.ToListAsync()).Should().BeEquivalentTo(new Certification[]
         {
             new("jan.kowalski@zhp.example.com", new(2023, 8, 29)),
             new("katarzyna.nazwisko@zhp.example.com", new(2023, 9, 8)),

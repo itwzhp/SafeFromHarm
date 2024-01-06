@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Polly;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
@@ -10,7 +9,8 @@ namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
 internal static class TipiHostBuilderExtensions
 {
     public static IServiceCollection AddTipiRequiredMembersFetcher(this IServiceCollection services)
-        => services.AddTipiWithHttpClient<IRequiredMembersFetcher, TipiRequiredMembersFetcher>();
+        => services.AddTipiWithHttpClient<IRequiredMembersFetcher, TipiRequiredMembersFetcher>()
+            .AddTipiWithHttpClient<TipiUnitsFetcher>();
 
     public static IServiceCollection AddTipiMembersFetcher(this IServiceCollection services)
         => services.AddTipiWithHttpClient<IMembersFetcher, TipiMembersFetcher>();
@@ -36,4 +36,8 @@ internal static class TipiHostBuilderExtensions
 
         return services;
     }
+
+    private static IServiceCollection AddTipiWithHttpClient<TImplementation>(this IServiceCollection services)
+        where TImplementation : class
+        => services.AddTipiWithHttpClient<TImplementation, TImplementation>();
 }

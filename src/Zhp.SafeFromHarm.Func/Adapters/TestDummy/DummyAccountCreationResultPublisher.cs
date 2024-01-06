@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.TestDummy;

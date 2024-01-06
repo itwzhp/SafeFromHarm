@@ -12,6 +12,7 @@ public class DependencyInjectionTests
     [Theory]
     [InlineData(typeof(CreateAccounts))]
     [InlineData(typeof(FindMissingRequiredCertifications))]
+    [InlineData(typeof(GenerateReports))]
     public void CheckServiceBuild(Type functionType)
     {
         var host = new HostBuilder()

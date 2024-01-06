@@ -2,7 +2,7 @@
 
 namespace Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
-public interface ICertifiedMembersFetcher
+public interface IReportSender
 {
-    IAsyncEnumerable<Certification> GetCertifiedMembers();
+    Task SendReport(Unit unit, IEnumerable<CertificationReport.ReportEntry> entries);
 }
