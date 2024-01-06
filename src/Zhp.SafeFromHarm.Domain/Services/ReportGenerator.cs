@@ -9,6 +9,8 @@ public class ReportGenerator(
     IReportSender sender,
     ISummarySender summarySender)
 {
+    const int HeadquartersId = 2;
+    
     public async Task SendReports(string? onlySendToEmail, CancellationToken cancellationToken)
     {
         var originalReport = await reportProvider.GetReport(cancellationToken);
@@ -20,6 +22,7 @@ public class ReportGenerator(
            : new CertificationReport(originalReport.Entries.Where(m => m.Member.Department.Email == onlySendToEmail).ToList());
 
         var reportsToSend = filteredReport.Entries
+            .Where(m => m.Member.Department.Id != HeadquartersId)
             .GroupBy(m => m.Member.Department);
 
         List<Unit> failedRecipients = [];

@@ -19,7 +19,7 @@ internal class TipiUnitsFetcher(HttpClient httpClient, IOptions<SafeFromHarmOpti
 
     private async Task<IReadOnlyDictionary<int, Unit>> GetUnits()
     {
-        using var result = await httpClient.GetAsync("/orgunits");
+        using var result = await httpClient.GetAsync("/orgunit");
         result.EnsureSuccessStatusCode();
 
         using var stream = await result.Content.ReadAsStreamAsync();

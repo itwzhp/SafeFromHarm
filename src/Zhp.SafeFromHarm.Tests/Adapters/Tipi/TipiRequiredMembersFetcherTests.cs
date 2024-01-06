@@ -13,7 +13,7 @@ public class TipiRequiredMembersFetcherTests
     public TipiRequiredMembersFetcherTests()
     {
         httpClient = new(httpHandler) { BaseAddress = new("https://example.zhp.pl") };
-        httpHandler.ResponseBody["/orgunits"] = """
+        httpHandler.ResponseBody["/orgunit"] = """
         [
             {
                 "orgunitId": 2657,
