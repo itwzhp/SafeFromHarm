@@ -39,6 +39,8 @@ public class ReportGenerator(
                 failedRecipients.Add(report.Key);
             }
         }
+
+        await sender.SendCentralReport(originalReport);
         
         cancellationToken.ThrowIfCancellationRequested();
 
