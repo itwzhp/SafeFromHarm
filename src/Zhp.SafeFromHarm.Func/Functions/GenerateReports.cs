@@ -28,7 +28,7 @@ public class GenerateReports(ILogger<GenerateReports> logger, ReportGenerator re
     }
 
     [Function("GenerateReportsSchedule")]
-    public async Task RunSchedule([TimerTrigger("0 43 2 28 * *")] TimerInfo myTimer, FunctionContext context)
+    public async Task RunSchedule([TimerTrigger("0 43 2 * * 1")] TimerInfo myTimer, FunctionContext context)
     {
         logger.LogInformation($"Starting function GenerateReportsSchedule...");
 
