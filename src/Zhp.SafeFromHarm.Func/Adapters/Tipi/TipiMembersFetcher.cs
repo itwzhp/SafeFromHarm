@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Tipi;
@@ -8,12 +8,13 @@ internal class TipiMembersFetcher(HttpClient httpClient) : IMembersFetcher
 {
     public async Task<Member?> GetMember(string membershipId, CancellationToken cancellationToken)
     {
-        var response = await httpClient.GetAsync($"memberdetails/{membershipId}", cancellationToken); //todo only letters?
+        using var response = await httpClient.GetAsync($"memberdetails/{membershipId}", cancellationToken);
 
         if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
             return null;
 
-        var result = (await JsonSerializer.DeserializeAsync<MemberDto>(await response.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken))
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        var result = (await JsonSerializer.DeserializeAsync<MemberDto>(stream, cancellationToken: cancellationToken))
             ?? throw new Exception("Received null result from Tipi");
 
         return result.activeMember

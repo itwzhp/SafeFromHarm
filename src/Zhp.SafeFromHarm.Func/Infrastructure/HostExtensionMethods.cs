@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using System.Security.Cryptography;
 using Zhp.SafeFromHarm.Domain;
+using Zhp.SafeFromHarm.Domain.Helpers;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Services;
@@ -38,11 +39,6 @@ public static class HostExtensionMethods
                 services
                     .AddAccountCreation(adapterToggles)
                     .AddCertificationNotifications(adapterToggles);
-
-                services
-                    .AddTransient<PasswordGenerator>()
-                    .AddTransient<CreateAccounts>()
-                    .AddTransient<FindMissingRequiredCertifications>();
             })
             .ConfigureMoodleServices()
             .ConfigureSmtp()
@@ -54,12 +50,15 @@ public static class HostExtensionMethods
         using var scope = host.Services.CreateScope();
         _ = scope.ServiceProvider.GetRequiredService<CreateAccounts>();
         _ = scope.ServiceProvider.GetRequiredService<FindMissingRequiredCertifications>();
+        _ = scope.ServiceProvider.GetRequiredService<GenerateReports>();
         return host;
     }
 
     private static IServiceCollection AddAccountCreation(this IServiceCollection services, AdapterTogglesOptions toggles)
     {
         services.AddTransient<AccountCreator>()
+            .AddTransient<PasswordGenerator>()
+            .AddTransient<CreateAccounts>()
             .AddSingleton(s => RandomNumberGenerator.Create());
 
         services.AddSwitch("AccountCreator", toggles.AccountCreator, new()
@@ -95,7 +94,12 @@ public static class HostExtensionMethods
 
     private static IServiceCollection AddCertificationNotifications(this IServiceCollection services, AdapterTogglesOptions toggles)
     {
-        services.AddTransient<MissingCertificationsNotifier>();
+        services
+            .AddTransient<CertificationReportProvider>()
+            .AddTransient<FindMissingRequiredCertifications>()
+            .AddTransient<MissingCertificationsNotifier>()
+            .AddTransient<ReportGenerator>()
+            .AddTransient<GenerateReports>();
 
         services.AddSwitch("CertifiedMembersFetcher", toggles.CertifiedMembersFetcher, new()
         {
@@ -120,10 +124,12 @@ public static class HostExtensionMethods
         {
             ["Dummy"] = s => s
                         .AddTransient<INotificationSender, DummyNotificationSender>()
-                        .AddTransient<ISummarySender, DummySummarySender>(),
+                        .AddTransient<ISummarySender, DummySummarySender>()
+                        .AddTransient<IReportSender, DummyReportSender>(),
             ["Smtp"] = s => s
                         .AddTransient<INotificationSender, SmtpNotificationSender>()
-                        .AddTransient<ISummarySender, SmtpSummarySender>(),
+                        .AddTransient<ISummarySender, SmtpSummarySender>()
+                        .AddTransient<IReportSender, SmtpReportSender>(),
         });
 
         return services;

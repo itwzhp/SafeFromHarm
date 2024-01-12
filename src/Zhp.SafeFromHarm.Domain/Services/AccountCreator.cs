@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using System.Text;
-using Zhp.SafeFromHarm.Domain.Model;
+using Zhp.SafeFromHarm.Domain.Helpers;
+using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
 using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 
 namespace Zhp.SafeFromHarm.Domain.Services;

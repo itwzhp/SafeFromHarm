@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zhp.SafeFromHarm.Func", "Zh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zhp.SafeFromHarm.Tests", "Zhp.SafeFromHarm.Tests\Zhp.SafeFromHarm.Tests.csproj", "{C0795494-2F94-4BF1-845E-F62089938F20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zhp.SafeFromHarm.Domain", "Zhp.SafeFromHarm.Domain\Zhp.SafeFromHarm.Domain.csproj", "{1F663339-C541-4A8D-B12F-1E9DB0D5B721}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zhp.SafeFromHarm.Domain", "Zhp.SafeFromHarm.Domain\Zhp.SafeFromHarm.Domain.csproj", "{1F663339-C541-4A8D-B12F-1E9DB0D5B721}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
