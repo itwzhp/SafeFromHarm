@@ -5,4 +5,6 @@ internal class GraphApiOptions
     public Guid SfhSiteId { get; init; }
 
     public Guid CreatedAccountsListId { get; init; }
+
+    public Guid UnitContactsListId { get; init; }
 }

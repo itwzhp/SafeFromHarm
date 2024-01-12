@@ -3,11 +3,14 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Func.Adapters.Smtp;
+using Zhp.SafeFromHarm.Func.Adapters.TestDummy;
 
 namespace Zhp.SafeFromHarm.Tests.Adapters.Smtp;
 
 public class SmtpNotificationSenderTests
 {
+    private static readonly Unit TestHufiec = new(10, "hufiec@zhp.example.com", "Hufiec");
+
     private readonly SmtpNotificationSender subject;
     private readonly ISmtpClient clientMock = Substitute.For<ISmtpClient>();
 
@@ -21,13 +24,13 @@ public class SmtpNotificationSenderTests
         var factoryMock = Substitute.For<ISmtpClientFactory>();
         factoryMock.GetClient().Returns(Task.FromResult(clientMock));
 
-        return new(Options.Create(smtpOptions), factoryMock);
+        return new(Options.Create(smtpOptions), factoryMock, new DummyUnitContactMailProvider());
     }
 
     [Fact]
     public async Task EmptyList_DoesNothing()
     {
-        await subject.NotifySupervisor("hufec@example.zhp.pl", "Hufiec", Enumerable.Empty<MemberToCertify>(), Enumerable.Empty<(MemberToCertify, DateOnly)>());
+        await subject.NotifySupervisor(TestHufiec, Enumerable.Empty<MemberToCertify>(), Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
         clientMock.ReceivedCalls().Should().BeEmpty();
     }
@@ -36,12 +39,11 @@ public class SmtpNotificationSenderTests
     public async Task SeveralPeopleToCertify_BuildsContent()
     {
         await subject.NotifySupervisor(
-            "hufiec@zhp.example.com",
-            "Hufiec",
+            TestHufiec,
             new MemberToCertify[]
             {
-                new("Jan", "Kowalski", "AA02", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew")),
-                new("Anna", "Nowak", "AA03", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew"))
+                new("Jan", "Kowalski", "AA02", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew")),
+                new("Anna", "Nowak", "AA03", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew"))
             },
             Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
@@ -55,12 +57,11 @@ public class SmtpNotificationSenderTests
     public async Task SeveralPeopleToCertify_PlainTextHasCorrectLinks()
     {
         await subject.NotifySupervisor(
-            "hufiec@zhp.example.com",
-            "Hufiec",
+            TestHufiec,
             new MemberToCertify[]
             {
-                new("Jan", "Kowalski", "AA02", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew")),
-                new("Anna", "Nowak", "AA03", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew"))
+                new("Jan", "Kowalski", "AA02", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew")),
+                new("Anna", "Nowak", "AA03", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew"))
             },
             Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
@@ -75,13 +76,12 @@ public class SmtpNotificationSenderTests
     public async Task SeveralPeopleCertified_BuildsContent()
     {
         await subject.NotifySupervisor(
-            "hufiec@zhp.example.com",
-            "Hufiec",
+            TestHufiec,
             Enumerable.Empty<MemberToCertify>(),
             new (MemberToCertify, DateOnly)[]
             {
-                (new("Jan", "Kowalski", "AA02", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew")), new(2023, 10, 02)),
-                (new("Anna", "Nowak", "AA03", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew")), new(2023, 12, 02))
+                (new("Jan", "Kowalski", "AA02", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew")), new(2023, 10, 02)),
+                (new("Anna", "Nowak", "AA03", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew")), new(2023, 12, 02))
             });
 
         var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
@@ -96,9 +96,8 @@ public class SmtpNotificationSenderTests
         var subject = BuildSubject(new() { OverrideRecipient = "overriden@example.zhp.pl", Username = "safe.from.harm@example.zhp.pl" });
 
         await subject.NotifySupervisor(
-            "hufiec@zhp.example.com",
-            "Hufiec",
-            new MemberToCertify[] { new("Jan", "Kowalski", "AA02", new(10, "hufiec@zhp.example.com", "Hufiec"), new(15, "choragiew@zhp.example.com", "Chorągiew")) },
+            TestHufiec,
+            new MemberToCertify[] { new("Jan", "Kowalski", "AA02", TestHufiec, new(15, "choragiew@zhp.example.com", "Chorągiew")) },
             Enumerable.Empty<(MemberToCertify, DateOnly)>());
 
         clientMock.ReceivedCalls().Single().GetArguments().First().Should().BeOfType<MimeMessage>()

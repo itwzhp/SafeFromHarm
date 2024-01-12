@@ -8,18 +8,21 @@ namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
 internal class SmtpReportSender(
     ISmtpClientFactory clientFactory,
-    IOptions<SmtpOptions> options) : IReportSender
+    IOptions<SmtpOptions> options,
+    IUnitContactMailProvider mailProvider) : IReportSender
 {
     private readonly SmtpOptions options = options.Value;
     public async Task SendReport(Unit unit, IEnumerable<CertificationReport.ReportEntry> entries)
     {
         var entriesList = entries.ToList();
 
-        var recipientMail = string.IsNullOrEmpty(options.OverrideRecipient)
-            ? unit.Email
-            : options.OverrideRecipient;
-
         var client = await clientFactory.GetClient();
+
+        var recipients = !string.IsNullOrEmpty(options.OverrideRecipient)
+            ? [new MailboxAddress(unit.Name, options.OverrideRecipient)]
+            : await mailProvider.GetEmailAddresses(unit.Id).Append(unit.Email).Distinct()
+                .Select(m => new MailboxAddress(unit.Name, m))
+                .ToListAsync();
 
         var html = BuildHtml(entriesList);
         var bodyBuilder = new BodyBuilder
@@ -40,7 +43,7 @@ internal class SmtpReportSender(
 
         var mail = new MimeMessage(
             from: new[] { new MailboxAddress("Safe from Harm", options.Username) },
-            to: new[] { new MailboxAddress(unit.Name, recipientMail) },
+            to: recipients,
             $"Raport chorągwiany ze szkoleń Safe from Harm - {unit.Name}",
             bodyBuilder.ToMessageBody());
 

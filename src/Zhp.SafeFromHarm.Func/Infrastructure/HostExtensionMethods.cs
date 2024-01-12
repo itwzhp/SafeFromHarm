@@ -109,9 +109,12 @@ public static class HostExtensionMethods
 
         services.AddSwitch("EmailMembershipNumberMapper", toggles.EmailMembershipNumberMapper, new()
         {
-            ["Dummy"] = s => s.AddTransient<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>(),
-            ["Moodle"] = s => s.AddSingleton<IEmailMembershipNumberMapper, MoodleEmailMembershipNumberMapper>(),
-            ["Ms365"] = s => s.AddSingleton<IEmailMembershipNumberMapper, EntraIdEmailMembershipNumberMapper>(),
+            ["Dummy"] = s =>
+                s.AddTransient<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>()
+                    .AddTransient<IUnitContactMailProvider, DummyUnitContactMailProvider>(),
+            ["Ms365"] = s =>
+                s.AddSingleton<IEmailMembershipNumberMapper, EntraIdEmailMembershipNumberMapper>()
+                    .AddSingleton<IUnitContactMailProvider, SharepointUnitContactMailProvider>(),
         });
 
         services.AddSwitch("RequiredMembersFetcher", toggles.RequiredMembersFetcher, new()

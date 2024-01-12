@@ -6,11 +6,14 @@ using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.Smtp;
 
-internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClientFactory clientFactory) : INotificationSender
+internal class SmtpNotificationSender(
+    IOptions<SmtpOptions> options,
+    ISmtpClientFactory clientFactory,
+    IUnitContactMailProvider mailProvider) : INotificationSender
 {
     private readonly SmtpOptions options = options.Value;
 
-    public async Task NotifySupervisor(string supervisorEmail, string supervisorUnitName, IEnumerable<MemberToCertify> missingCertificationMembers, IEnumerable<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
+    public async Task NotifySupervisor(Unit supervisor, IEnumerable<MemberToCertify> missingCertificationMembers, IEnumerable<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
     {
         var membersToCertify = missingCertificationMembers.ToList();
         var certifiedMemebersList = certifiedMembers.ToList();
@@ -19,9 +22,11 @@ internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClient
 
         var client = await clientFactory.GetClient();
 
-        var recipientAdress = string.IsNullOrEmpty(options.OverrideRecipient)
-            ? supervisorEmail
-            : options.OverrideRecipient;
+        var recipients = !string.IsNullOrEmpty(options.OverrideRecipient)
+            ? [ new MailboxAddress(supervisor.Name, options.OverrideRecipient) ]
+            : await mailProvider.GetEmailAddresses(supervisor.Id).Append(supervisor.Email).Distinct()
+                .Select(m => new MailboxAddress(supervisor.Name, m))
+                .ToListAsync();
 
         var html = BuildHtmlContent(membersToCertify, certifiedMemebersList);
 
@@ -33,7 +38,7 @@ internal class SmtpNotificationSender(IOptions<SmtpOptions> options, ISmtpClient
 
         var mail = new MimeMessage(
             from: new[] { new MailboxAddress("Safe from Harm", options.Username) },
-            to: new[] { new MailboxAddress(supervisorUnitName, recipientAdress) },
+            to: recipients,
             "Raport z niewykonanych szkoleń Safe from Harm",
             bodyBuilder.ToMessageBody());
 

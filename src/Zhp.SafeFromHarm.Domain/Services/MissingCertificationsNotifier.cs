@@ -36,7 +36,7 @@ public class MissingCertificationsNotifier(
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
             try
             {
-                await sender.NotifySupervisor(notification.Key.Email, notification.Key.Name, missingCertificationMembers, certified);
+                await sender.NotifySupervisor(notification.Key, missingCertificationMembers, certified);
             }
             catch(Exception ex)
             {
