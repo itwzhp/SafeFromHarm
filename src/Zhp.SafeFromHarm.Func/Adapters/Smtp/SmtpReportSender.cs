@@ -70,7 +70,7 @@ internal class SmtpReportSender(
         var builder = new StringBuilder($"""
             Czuwaj,<br>
             <p>Oto raport z wykonywania szkoleń Safe from Harm dla Twojej chorągwi. Raporty zostały również przesłane poszczególnym hufcom.</p>
-            <p>W Chorągwi certyfikowano {totalCertified} z {total} wymaganych ({totalPercentage:P0}), w poszczególnych chorągwiach jest to:
+            <p>W Chorągwi certyfikowano {totalCertified} z {total} wymaganych ({totalPercentage:P0}), w poszczególnych hufcach jest to:
             <ul>
             """);
 
