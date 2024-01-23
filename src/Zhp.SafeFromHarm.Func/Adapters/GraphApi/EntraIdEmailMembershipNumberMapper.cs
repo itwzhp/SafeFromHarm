@@ -15,10 +15,11 @@ internal class EntraIdEmailMembershipNumberMapper(
 
     public async ValueTask<string?> GetMembershipNumberForEmail(string email)
     {
+        const legacyFakeMailSuffix = "@example.zhp.pl";
         var fakeMailSuffix = $"@{options.Value.MoodleAccountMailFakeDomain}";
 
-        if (email.EndsWith(fakeMailSuffix))
-            return email.Replace(fakeMailSuffix, string.Empty);
+        if (email.EndsWith(fakeMailSuffix) || email.EndsWith(legacyFakeMailSuffix))
+            return email.Replace(fakeMailSuffix, string.Empty).Replace(legacyFakeMailSuffix, string.Empty);
 
         this.map ??= await BuildMap();
 
