@@ -59,6 +59,8 @@ public class AccountCreator(
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        return new AccountCreationResult(requestedMember, password, await creator.CreateAccount(fetchedMember, password));
+        var result = await creator.CreateAccount(fetchedMember, password);
+
+        return new AccountCreationResult(requestedMember, result == AccountCreationResult.ResultType.Success ? password : null, result);
     }
 }
