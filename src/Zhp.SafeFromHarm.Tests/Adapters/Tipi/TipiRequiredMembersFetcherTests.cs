@@ -39,6 +39,12 @@ public class TipiRequiredMembersFetcherTests
                 "orgunitId": 2031,
                 "name": "Chorągiew Łódzka",
                 "primaryEmail": "lodzka@zhp.pl"
+            },
+            {
+        	    "orgunitId": 1416,
+        	    "name": "Hufiec Chełm",
+        	    "primaryEmail": null,
+        	    "extraEmails": "chelm@zhp.pl;biuro@example.zhp.pl"
             }
         ]
         """;
@@ -154,6 +160,30 @@ public class TipiRequiredMembersFetcherTests
         var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
 
         result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("fallback@zhp.pl");
+    }
+
+    [Fact]
+    public async Task NullPrimaryMail_SetsSecondaryMail()
+    {
+        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
+        [
+            {
+        	    "memberId": "BD1",
+        	    "personId": 370645,
+        	    "firstName": "Anna",
+        	    "lastName": "Kowalska",
+        	    "birthdate": 1012518000,
+                "memberRoles": null,
+                "hufiecId": 1416,
+                "choragiewId": 5967
+            }
+        ]
+        """;
+        var subject = BuildSubject("fallback@zhp.pl");
+
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+
+        result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("chelm@zhp.pl");
     }
 
     [Fact]

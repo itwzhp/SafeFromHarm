@@ -34,7 +34,7 @@ internal class TipiUnitsFetcher(HttpClient httpClient, IOptions<SafeFromHarmOpti
         if(dto == null)
             return null;
 
-        var mail = dto.primaryEmail ?? controlTeamsChannelMail;
+        var mail = dto.primaryEmail ?? dto.extraEmails ?? controlTeamsChannelMail;
         mail = mail?.Split(';').First();
 
         return mail == null
@@ -43,5 +43,5 @@ internal class TipiUnitsFetcher(HttpClient httpClient, IOptions<SafeFromHarmOpti
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for deserialization")]
-    private record UnitDto(int orgunitId, string name, string? primaryEmail);
+    private record UnitDto(int orgunitId, string name, string? primaryEmail, string? extraEmails);
 }
