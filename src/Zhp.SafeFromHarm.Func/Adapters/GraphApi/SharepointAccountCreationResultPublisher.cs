@@ -25,16 +25,21 @@ internal class SharepointAccountCreationResultPublisher(
 
         var requestResponses = await client.Batch.PostAsync(batchRequest);
         var requestStatusCodes = await requestResponses.GetResponsesStatusCodesAsync();
-        var erroneusCodes = requestStatusCodes.Where(r => (int)r.Value < 200 || (int)r.Value > 299).Select(r => r.Key).ToList();
 
-        foreach (var error in erroneusCodes)
+        foreach (var (id, code) in requestStatusCodes)
         {
-            var message = await (await requestResponses.GetResponseByIdAsync(error)).Content.ReadAsStringAsync();
+            if ((int)code >= 200 || (int)code <= 299)
+            {
+                logger.LogInformation("Sharepoint account entry posted properly");
+            }
+            else
+            {
+                var message = await (await requestResponses.GetResponseByIdAsync(id)).Content.ReadAsStringAsync();
 
-            logger.LogError("Error while creating account for {member}: {error}, {response}",
-                error,
-                requestStatusCodes[error],
-                message);
+                logger.LogError("Error while posting account entry to sharepoint {code}: {response}",
+                    code,
+                    message);
+            }
         }
     }
 
