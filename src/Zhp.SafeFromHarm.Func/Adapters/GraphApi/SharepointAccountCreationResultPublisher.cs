@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Kiota.Abstractions;
 using Zhp.SafeFromHarm.Domain.Model.AccountCreation;
@@ -6,7 +7,10 @@ using Zhp.SafeFromHarm.Domain.Ports.AccountCreation;
 
 namespace Zhp.SafeFromHarm.Func.Adapters.GraphApi;
 
-internal class SharepointAccountCreationResultPublisher(GraphServiceClient client, IOptions<GraphApiOptions> options) : IAccountCreationResultPublisher
+internal class SharepointAccountCreationResultPublisher(
+    GraphServiceClient client,
+    IOptions<GraphApiOptions> options,
+    ILogger<SharepointAccountCreationResultPublisher> logger) : IAccountCreationResultPublisher
 {
     public async Task PublishResult(IReadOnlyCollection<AccountCreationResult> result, string requestorEmail)
     {
@@ -19,7 +23,19 @@ internal class SharepointAccountCreationResultPublisher(GraphServiceClient clien
         foreach (var request in requests)
             await batchRequest.AddBatchRequestStepAsync(request);
 
-        await client.Batch.PostAsync(batchRequest);
+        var requestResponses = await client.Batch.PostAsync(batchRequest);
+        var requestStatusCodes = await requestResponses.GetResponsesStatusCodesAsync();
+        var erroneusCodes = requestStatusCodes.Where(r => (int)r.Value < 200 || (int)r.Value > 299).Select(r => r.Key).ToList();
+
+        foreach (var error in erroneusCodes)
+        {
+            var message = await (await requestResponses.GetResponseByIdAsync(error)).Content.ReadAsStringAsync();
+
+            logger.LogError("Error while creating account for {member}: {error}, {response}",
+                error,
+                requestStatusCodes[error],
+                message);
+        }
     }
 
     private RequestInformation BuildRequest(Member member, string password, string requestorEmail)

@@ -8,7 +8,7 @@ internal class DummyAccountCreator(ILogger<DummyAccountCreator> logger) : IAccou
 {
     public Task<AccountCreationResult.ResultType> CreateAccount(Member member, string password)
     {
-        var result = member.MembershipNumber.Length % 2 == 0
+        var result = member.MembershipNumber.Length % 2 != 0
             ? AccountCreationResult.ResultType.Success
             : AccountCreationResult.ResultType.MemberAlreadyHasMoodle;
 
