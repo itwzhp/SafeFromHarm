@@ -5,7 +5,7 @@ namespace Zhp.SafeFromHarm.Tests.Adapters.Moodle;
 
 internal static class MoodleTestFactory
 {
-    public static MoodleClient MoodleClient => new(new HttpClient(new MoodleTestHttpHandler()), MoodleOptions);
+    public static MoodleClient MoodleClient => new(new HttpClient(new MoodleTestHttpHandler()) { BaseAddress = new("https://example.zhp.pl")}, MoodleOptions);
 
     public static IOptions<MoodleOptions> MoodleOptions => new OptionsWrapper<MoodleOptions>(new());
 }

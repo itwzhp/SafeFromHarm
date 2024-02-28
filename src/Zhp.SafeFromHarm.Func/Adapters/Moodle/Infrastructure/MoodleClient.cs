@@ -12,7 +12,7 @@ internal class MoodleClient(HttpClient httpClient, IOptions<MoodleOptions> optio
     public async ValueTask<T> CallMoodle<T>(MoodleFunctions function, Dictionary<string, object> parameters)
     {
         using var body = new FormUrlEncodedContent(parameters.Select(p => KeyValuePair.Create(p.Key, p.Value.ToString())));
-        var uri = new Uri(options.MoodleBaseUri, $"webservice/rest/server.php?wstoken={options.MoodleToken}&wsfunction={function}&moodlewsrestformat=json");
+        var uri = $"webservice/rest/server.php?wstoken={options.MoodleToken}&wsfunction={function}&moodlewsrestformat=json";
         
         using var response = await httpClient.PostAsync(uri, body);
         response.EnsureSuccessStatusCode();
