@@ -62,7 +62,7 @@ internal class SmtpNotificationSender(
             b.AppendLine("""
                     </ol>
                     <p>Poproś ich o ukończenie e-szkolenia i wypełnienie testu w <a href="https://edu.zhp.pl/course/view.php?id=47">Harcerskim Serwisie Szkoleniowym</a>.
-                    Jeśli ta informacja jest nieaktualna zaktualizuj Tipi, aby poprawić przydział i funkcje tych członków.</p>
+                    Jeśli ta informacja jest błędna, wypełnij <a href="https://jira.zhp.pl/plugins/servlet/desk/portal/9/create/101">formularz na helpdesku</a></p>
                     """);
         }
 
@@ -87,7 +87,7 @@ internal class SmtpNotificationSender(
             <br>            
             Posiadanie ważnego certyfikatu Safe From Harm, poświadczającego, że osoba ukończyła szkolenie z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych w ZHP jest obowiązkiem:
             <ul>
-            <li>wszystkich osób pełnoletnich w ZHP - w czasie 3 miesięcy od osiągnięcia pełnoletniości lub wstąpienia do organizacji,</li>
+            <li>wszystkich osób pełnoletnich w ZHP - w czasie 3 miesięcy od osiągnięcia pełnoletniości lub wstąpienia do organizacji (z wyjątkami opisanymi w Polityce),</li>
             <li>osób niepełnoletnich, pełniących funkcje wychowawcze - w momencie mianowania na funkcję,</li>
             <li>osób otwierających próby na stopnie instruktorskie.</li>
             </ul>
