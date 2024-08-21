@@ -30,13 +30,18 @@ internal class TipiRequiredMembersFetcher(
         if (entry == null)
             return null;
 
-        int supervisorId = entry.hufiecId ?? entry.choragiewId;
+        if(entry.choragiewId == null)
+            return null;
+
+        var choragiew = entry.choragiewId.Value;
+
+        int supervisorId = entry.hufiecId ?? choragiew;
 
         var supervisor = await unitsFetcher.GetUnit(supervisorId);
         if (supervisor == null)
             return null;
 
-        var department = await unitsFetcher.GetUnit(entry.choragiewId);
+        var department = await unitsFetcher.GetUnit(choragiew);
         if (department == null)
             return null;
 
@@ -54,6 +59,6 @@ internal class TipiRequiredMembersFetcher(
         string firstName,
         string lastName,
         int? hufiecId,
-        int choragiewId);
+        int? choragiewId);
 
 }

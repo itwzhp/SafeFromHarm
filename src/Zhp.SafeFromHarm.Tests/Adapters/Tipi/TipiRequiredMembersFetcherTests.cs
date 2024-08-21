@@ -219,4 +219,38 @@ public class TipiRequiredMembersFetcherTests
 
         result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("radomsko@zhp.pl");
     }
+
+    [Fact]
+    public async Task NullUnit_DoesntReturnItem()
+    {
+        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
+        [
+            {
+            	"memberId": "AA01",
+            	"personId": 12345,
+            	"firstName": "Jan",
+            	"lastName": "Kowalski",
+            	"birthdate": 1408744800,
+                "memberRoles": "drużynowy",
+                "hufiecId": null,
+                "choragiewId": null
+            },
+            {
+            	"memberId": "AA02",
+            	"personId": 54321,
+            	"firstName": "Anna",
+            	"lastName": "Malinowska",
+            	"birthdate": 1374962400,
+                "memberRoles": "członek zespołu promocji i informacji hufca",
+                "hufiecId": 6127,
+                "choragiewId": 5967
+            }
+        ]
+        """;
+        var subject = BuildSubject(null);
+
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+
+        result.Should().ContainSingle().Which.MembershipNumber.Should().Be("AA02");
+    }
 }
