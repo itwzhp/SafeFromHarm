@@ -20,8 +20,18 @@ internal static class MoodleHostBuilderExtensions
             {
                 var options = serviceProvider.GetRequiredService<IOptions<MoodleOptions>>().Value;
 
-                client.BaseAddress = options.MoodleBaseUri;
                 client.Timeout = TimeSpan.FromMinutes(5);
+
+                if (string.IsNullOrEmpty(options.MoodleHostName))
+                {
+                    client.BaseAddress = options.MoodleBaseUri;
+                }
+                else
+                {
+                    // This is a workaround for timeout built in CloudFlare. This way we can bypass it. and make request longer than 100 seconds.
+                    client.BaseAddress = new UriBuilder(options.MoodleBaseUri) { Host = options.MoodleHostName }.Uri;
+                    client.DefaultRequestHeaders.Host = options.MoodleBaseUri.Host;
+                }
             });
         });
 
