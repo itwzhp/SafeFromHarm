@@ -21,5 +21,8 @@ internal class DummyRequiredMembersFetcher : IRequiredMembersFetcher
             new("Anna", "Nowak", "AA03", hufiec1, choragiew1),
 
             new("Anna", "Malinowska", "AA05", hufiec3, choragiew2),
+
+            new("Anna", "Abacka", "AA05", choragiew1, choragiew1),
+            new("Anna", "Cabacka", "AA05", choragiew1, choragiew1),
         }.ToAsyncEnumerable();
 }

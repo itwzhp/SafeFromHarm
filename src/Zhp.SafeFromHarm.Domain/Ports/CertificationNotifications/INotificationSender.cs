@@ -7,5 +7,8 @@ public interface INotificationSender
     Task NotifySupervisor(
         Unit supervisor,
         IEnumerable<MemberToCertify> missingCertificationMembers,
-        IEnumerable<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers);
+        IEnumerable<CertifiedMember> certifiedMembers,
+        IEnumerable<CertificationReport.ReportEntry> allMembersIncludingSubunits);
 }
+
+public record CertifiedMember(MemberToCertify Member, DateOnly CertificationDate);

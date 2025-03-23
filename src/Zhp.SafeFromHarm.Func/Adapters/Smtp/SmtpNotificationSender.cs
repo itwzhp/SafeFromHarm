@@ -13,11 +13,17 @@ internal class SmtpNotificationSender(
 {
     private readonly SmtpOptions options = options.Value;
 
-    public async Task NotifySupervisor(Unit supervisor, IEnumerable<MemberToCertify> missingCertificationMembers, IEnumerable<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
+    public async Task NotifySupervisor(
+        Unit supervisor,
+        IEnumerable<MemberToCertify> missingCertificationMembers,
+        IEnumerable<CertifiedMember> certifiedMembers,
+        IEnumerable<CertificationReport.ReportEntry> allCertificationMembersIncludingSubunits)
     {
         var membersToCertify = missingCertificationMembers.ToList();
         var certifiedMemebersList = certifiedMembers.ToList();
-        if (membersToCertify.Count == 0 && certifiedMemebersList.Count == 0)
+        var allMembers = allCertificationMembersIncludingSubunits.ToList();
+
+        if (membersToCertify.Count == 0 && certifiedMemebersList.Count == 0 && allMembers.Count == 0)
             return;
 
         var client = await clientFactory.GetClient();
@@ -28,16 +34,19 @@ internal class SmtpNotificationSender(
                 .Select(m => new MailboxAddress(supervisor.Name, m))
                 .ToListAsync();
 
-        var html = BuildHtmlContent(membersToCertify, certifiedMemebersList);
+        var html = BuildHtmlContent(membersToCertify, certifiedMemebersList, allMembers.Count > 0);
 
         var bodyBuilder = new BodyBuilder
         {
             TextBody = SmtpHelper.ClearHtml(html),
-            HtmlBody = html
+            HtmlBody = html,
         };
 
+        if(allMembers.Count > 0)
+            bodyBuilder.Attachments.Add("raport.csv", BuildCsvReport(allMembers), new ContentType("text", "csv"));
+
         var mail = new MimeMessage(
-            from: new[] { new MailboxAddress("Safe from Harm", options.Username) },
+            from: [new MailboxAddress("Safe from Harm", options.Username)],
             to: recipients,
             "Raport z niewykonanych szkoleń Safe from Harm",
             bodyBuilder.ToMessageBody());
@@ -45,7 +54,7 @@ internal class SmtpNotificationSender(
         await client.SendAsync(mail);
     }
 
-    private static string BuildHtmlContent(List<MemberToCertify> missingCertificationMembers, List<(MemberToCertify Member, DateOnly CertificationDate)> certifiedMembers)
+    private static string BuildHtmlContent(List<MemberToCertify> missingCertificationMembers, List<CertifiedMember> certifiedMembers, bool addAttachmentReport)
     {
         var b = new StringBuilder("Czuwaj,<br>\n");
 
@@ -82,6 +91,9 @@ internal class SmtpNotificationSender(
                """);
         }
 
+        if (addAttachmentReport)
+            b.AppendLine("<p>W załączniku znajduje się raport ze szkoleń SfH uwzględniający jednostki podległe. Jest to plik CSV, który można otworzyć np. przy pomocy programu Excel.</p>");
+
         b.Append(
             """
             <br>            
@@ -99,5 +111,29 @@ internal class SmtpNotificationSender(
             """);
 
         return b.ToString();
+    }
+
+    private static MemoryStream BuildCsvReport(List<CertificationReport.ReportEntry> allMembers)
+    {
+        const char s = ',';
+        var stream = new MemoryStream();
+        using (var writter = new StreamWriter(stream, leaveOpen: true, encoding: Encoding.UTF8))
+        {
+            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Data certyfikatu");
+            foreach (var entry in allMembers)
+            {
+                writter.WriteLine(string.Join(s,
+                    [
+                        entry.Member.FirstName,
+                    entry.Member.LastName,
+                    entry.Member.MembershipNumber,
+                    entry.Member.Supervisor.Name,
+                    entry.CertificationDate?.ToString("yyyy-MM-dd") ?? "brak"
+                    ]));
+            }
+        }
+
+        stream.Seek(0, SeekOrigin.Begin);
+        return stream;
     }
 }

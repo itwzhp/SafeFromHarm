@@ -17,10 +17,13 @@ public class MissingCertificationsNotifier(
 
         var filteredReport = onlySendToEmail == null
             ? originalReport
-            : new CertificationReport(originalReport.Entries.Where(m => m.Member.Supervisor.Email == onlySendToEmail).ToList());
+            : new CertificationReport([.. originalReport.Entries.Where(m => m.Member.Supervisor.Email == onlySendToEmail)]);
 
         var notificationsToSend = filteredReport.Entries
-            .GroupBy(m => m.Member.Supervisor);
+            .GroupBy(m => (m.Member.Supervisor, m.Member.Department));
+
+        var membersPerDepartment = filteredReport.Entries
+            .ToLookup(m => m.Member.Department);
 
         var failedRecipients = new List<(string Email, string UnitName)>();
 
@@ -31,17 +34,17 @@ public class MissingCertificationsNotifier(
             var groupedByCert = notification.ToLookup(n => n.CertificationDate.HasValue);
 
             var missingCertificationMembers = groupedByCert[false].Select(m => m.Member).ToList();
-            var certified = groupedByCert[true].Select(m => (m.Member, m.CertificationDate!.Value)).ToList();
+            var certified = groupedByCert[true].Select(m => new CertifiedMember(m.Member, m.CertificationDate!.Value)).ToList();
             
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
             try
             {
-                await sender.NotifySupervisor(notification.Key, missingCertificationMembers, certified);
+                await sender.NotifySupervisor(notification.Key.Supervisor, missingCertificationMembers, certified, membersPerDepartment[notification.Key.Supervisor]);
             }
             catch(Exception ex)
             {
-                logger.LogError(ex, "Unable to send message to {unit} <{email}>", notification.Key.Name, notification.Key.Email);
-                failedRecipients.Add((notification.Key.Email, notification.Key.Name));
+                logger.LogError(ex, "Unable to send message to {unit} <{email}>", notification.Key.Supervisor.Name, notification.Key.Supervisor.Email);
+                failedRecipients.Add((notification.Key.Supervisor.Email, notification.Key.Supervisor.Name));
             }
         }
 
