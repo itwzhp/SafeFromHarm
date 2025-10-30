@@ -30,7 +30,7 @@ internal class TipiRequiredMembersFetcher(
         if (entry == null)
             return null;
 
-        if(entry.choragiewId == null)
+        if(entry.choragiewId == null || entry.allocationUnitName == null)
             return null;
 
         var choragiew = entry.choragiewId.Value;
@@ -50,7 +50,8 @@ internal class TipiRequiredMembersFetcher(
                 entry.lastName,
                 entry.memberId,
                 supervisor,
-                department);
+                department,
+                entry.allocationUnitName);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for deserialization")]
@@ -59,6 +60,7 @@ internal class TipiRequiredMembersFetcher(
         string firstName,
         string lastName,
         int? hufiecId,
-        int? choragiewId);
+        int? choragiewId,
+        string? allocationUnitName);
 
 }

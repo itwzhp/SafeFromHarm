@@ -42,7 +42,7 @@ internal class SmtpReportSender(
         };
 
         var mail = new MimeMessage(
-            from: new[] { new MailboxAddress("Safe from Harm", options.Username) },
+            from: [new MailboxAddress("Safe from Harm", options.Username)],
             to: recipients,
             $"Raport chorągwiany ze szkoleń Safe from Harm - {unit.Name}",
             bodyBuilder.ToMessageBody());
@@ -55,16 +55,16 @@ internal class SmtpReportSender(
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, new UTF8Encoding(true), leaveOpen: true);
 
-        writer.WriteLine("Członek,Numer ewidencji,Chorągiew,Hufiec,Data certyfikacji");
+        writer.WriteLine("Członek,Numer ewidencji,Chorągiew,Hufiec,Data certyfikacji,Przydział");
         foreach (var entry in entries)
         {
-            writer.WriteLine($"{entry.Member.FirstName} {entry.Member.LastName},{entry.Member.MembershipNumber},{entry.Member.Department.Name},{entry.Member.Supervisor.Name},{entry.CertificationDate}");
+            writer.WriteLine($"{entry.Member.FirstName} {entry.Member.LastName},{entry.Member.MembershipNumber},{entry.Member.Department.Name},{entry.Member.Supervisor.Name},{entry.CertificationDate},{entry.Member.AllocationUnitName}");
         }
 
         return stream;
     }
 
-    private static string BuildRegionalHtml(IReadOnlyCollection<CertificationReport.ReportEntry> entries)
+    private static string BuildRegionalHtml(List<CertificationReport.ReportEntry> entries)
     {
         var totalCertified = entries.Count(e => e.CertificationDate != null);
         var total = entries.Count;
@@ -116,7 +116,7 @@ internal class SmtpReportSender(
         };
 
         var mail = new MimeMessage(
-            from: new[] { new MailboxAddress("Safe from Harm", options.Username) },
+            from: [new MailboxAddress("Safe from Harm", options.Username)],
             to: recipients,
             $"Raport centralny ze szkoleń Safe from Harm",
             bodyBuilder.ToMessageBody());

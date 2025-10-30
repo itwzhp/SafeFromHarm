@@ -76,6 +76,8 @@ public class TipiRequiredMembersFetcherTests
             	"firstName": "Jan",
             	"lastName": "Kowalski",
             	"birthdate": 1408744800,
+                "allocationUnitName": "10 Jakaś Wodna Drużyna Harcerska",
+                "allocationUnitId": 1111,
                 "memberRoles": "drużynowy",
                 "hufiecId": 2657,
                 "choragiewId": 2031
@@ -86,6 +88,8 @@ public class TipiRequiredMembersFetcherTests
             	"firstName": "Anna",
             	"lastName": "Malinowska",
             	"birthdate": 1374962400,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": "członek zespołu promocji i informacji hufca",
                 "hufiecId": 6127,
                 "choragiewId": 5967
@@ -96,6 +100,8 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Jan",
         	    "lastName": "Kowalski",
         	    "birthdate": -446086800,
+                "allocationUnitName": "Chorągiew Śląska",
+                "allocationUnitId": 5967,
                 "memberRoles": null,
                 "hufiecId": null,
                 "choragiewId": 5967
@@ -108,9 +114,24 @@ public class TipiRequiredMembersFetcherTests
 
         result.Should().BeEquivalentTo(new MemberToCertify[]
         {
-            new("Jan", "Kowalski", "AA01", new(2657, "Hufiec Radomsko", "radomsko@zhp.pl"), new(2031, "Chorągiew Łódzka", "lodzka@zhp.pl")),
-            new("Anna", "Malinowska", "AA02", new(6127, "Hufiec Ziemi Cieszyńskiej", "cieszyn@zhp.pl"), new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl")),
-            new("Jan", "Kowalski", "AB123", new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"), new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl")),
+            new("Jan",
+                "Kowalski",
+                "AA01",
+                new(2657, "Hufiec Radomsko", "radomsko@zhp.pl"),
+                new(2031, "Chorągiew Łódzka", "lodzka@zhp.pl"),
+                "10 Jakaś Wodna Drużyna Harcerska"),
+            new("Anna",
+                "Malinowska",
+                "AA02",
+                new(6127, "Hufiec Ziemi Cieszyńskiej", "cieszyn@zhp.pl"),
+                new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"),
+                "Hufiec Ziemi Cieszyńskiej"),
+            new("Jan",
+                "Kowalski",
+                "AB123",
+                new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"),
+                new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"),
+                "Chorągiew Śląska")
         });
     }
 
@@ -125,6 +146,8 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Jan",
         	    "lastName": "Kowalski",
         	    "birthdate": -446086800,
+                "allocationUnitName": "Chorągiew Śląska",
+                "allocationUnitId": 5967,
                 "memberRoles": null,
                 "hufiecId": null,
                 "choragiewId": 5967
@@ -149,6 +172,8 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 20006,
                 "choragiewId": 5967
@@ -173,6 +198,8 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 1416,
                 "choragiewId": 5967
@@ -197,6 +224,8 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 20006,
                 "choragiewId": 5967
@@ -207,6 +236,8 @@ public class TipiRequiredMembersFetcherTests
         	    "firstName": "Anna",
         	    "lastName": "Kowalska",
         	    "birthdate": 1012518000,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 2657,
                 "choragiewId": 5967
@@ -231,6 +262,8 @@ public class TipiRequiredMembersFetcherTests
             	"firstName": "Jan",
             	"lastName": "Kowalski",
             	"birthdate": 1408744800,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": "drużynowy",
                 "hufiecId": null,
                 "choragiewId": null
@@ -241,9 +274,23 @@ public class TipiRequiredMembersFetcherTests
             	"firstName": "Anna",
             	"lastName": "Malinowska",
             	"birthdate": 1374962400,
+                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
+                "allocationUnitId": 6127,
                 "memberRoles": "członek zespołu promocji i informacji hufca",
                 "hufiecId": 6127,
                 "choragiewId": 5967
+            },
+            {
+            	"memberId": "AA03",
+            	"personId": 12345,
+            	"firstName": "Jan",
+            	"lastName": "Kowalski2",
+            	"birthdate": 1408744800,
+                "allocationUnitName": null,
+                "allocationUnitId": null,
+                "memberRoles": "drużynowy",
+                "hufiecId": null,
+                "choragiewId": null
             }
         ]
         """;
