@@ -5,4 +5,5 @@
 /// </summary>
 /// <param name="Supervisor">Jednostka bezpośrednio nadzorująca certyfikację (hufiec, chorągiew lub GK)</param>
 /// <param name="Department">Jednostka, w której działa pełnomocnik SFH - Chorągiew lub GK-a</param>
-public record MemberToCertify(string FirstName, string LastName, string MembershipNumber, Unit Supervisor, Unit Department);
+/// <param name="Allocation">Jednoska, do której członek ma bezpośredni przydział</param>
+public record MemberToCertify(string FirstName, string LastName, string MembershipNumber, Unit Supervisor, Unit Department, string AllocationUnitName);

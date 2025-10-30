@@ -43,8 +43,8 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             TestHufiec,
             [
-                new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew),
-                new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew)
+                new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, TestHufiec.Name),
+                new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew, TestHufiec.Name)
             ],
             [],
             []);
@@ -61,8 +61,8 @@ public class SmtpNotificationSenderTests
         await subject.NotifySupervisor(
             TestHufiec,
             [
-                new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew),
-                new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew)
+                new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, TestHufiec.Name),
+                new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew, TestHufiec.Name)
             ],
             [],
             []);
@@ -81,15 +81,15 @@ public class SmtpNotificationSenderTests
             TestHufiec,
             [],
             [
-                new (new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew), new(2023, 10, 02)),
-                new (new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew), new(2023, 12, 02))
+                new (new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, "Drużyna Testowa"), new(2023, 10, 02)),
+                new (new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew, TestHufiec.Name), new(2023, 12, 02))
             ],
             []);
 
         var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
             .Body.As<MultipartAlternative>();
-        sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03) - 02.12.2023");
-        sentBody.TextBody.Should().Contain("Anna Nowak (AA03) - 02.12.2023");
+        sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03) - 02.12.2023").And.Contain("Drużyna Testowa");
+        sentBody.TextBody.Should().Contain("Anna Nowak (AA03) - 02.12.2023").And.Contain("Drużyna Testowa");
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class SmtpNotificationSenderTests
 
         await subject.NotifySupervisor(
             TestHufiec,
-            [new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew)],
+            [new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, TestHufiec.Name)],
             [],
             []);
 
@@ -117,8 +117,8 @@ public class SmtpNotificationSenderTests
             [],
             [],
             [
-                new (new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew), new(2023, 10, 02)),
-                new (new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew), null)
+                new (new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, TestHufiec.Name), new(2023, 10, 02)),
+                new (new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew, TestHufiec.Name    ), null)
             ]);
 
         var attachment = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single().Attachments.Single();

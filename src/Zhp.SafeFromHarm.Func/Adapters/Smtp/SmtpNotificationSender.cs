@@ -66,7 +66,7 @@ internal class SmtpNotificationSender(
                 """);
 
             foreach (var member in missingCertificationMembers)
-                b.AppendLine($"<li>{member.FirstName} {member.LastName} ({member.MembershipNumber})</li>");
+                b.AppendLine($"<li>{member.FirstName} {member.LastName} ({member.MembershipNumber}) - {member.AllocationUnitName}</li>");
 
             b.AppendLine("""
                     </ol>
@@ -83,7 +83,7 @@ internal class SmtpNotificationSender(
                 """);
 
             foreach (var (member, certificationDate) in certifiedMembers)
-                b.AppendLine($"<li>{member.FirstName} {member.LastName} ({member.MembershipNumber}) - {certificationDate:dd.MM.yyyy}</li>");
+                b.AppendLine($"<li>{member.FirstName} {member.LastName} ({member.MembershipNumber}) - {certificationDate:dd.MM.yyyy}, {member.AllocationUnitName}</li>");
             
             b.AppendLine("""
                </ol>
@@ -119,7 +119,7 @@ internal class SmtpNotificationSender(
         var stream = new MemoryStream();
         using (var writter = new StreamWriter(stream, leaveOpen: true, encoding: Encoding.UTF8))
         {
-            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Data certyfikatu");
+            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Przydzial{s} Data certyfikatu");
             foreach (var entry in allMembers)
             {
                 writter.WriteLine(string.Join(s,
@@ -128,6 +128,7 @@ internal class SmtpNotificationSender(
                     entry.Member.LastName,
                     entry.Member.MembershipNumber,
                     entry.Member.Supervisor.Name,
+                    entry.Member.AllocationUnitName,
                     entry.CertificationDate?.ToString("yyyy-MM-dd") ?? "brak"
                     ]));
             }

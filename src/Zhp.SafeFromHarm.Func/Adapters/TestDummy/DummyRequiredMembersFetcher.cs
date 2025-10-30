@@ -15,14 +15,14 @@ internal class DummyRequiredMembersFetcher : IRequiredMembersFetcher
     public IAsyncEnumerable<MemberToCertify> GetMembersRequiredToCertify()
         => new MemberToCertify[]
         {
-            new("Jan", "Kowalski", "AA01", hufiec1, choragiew1),
-            new("Jan", "Kowalski", "AA02", hufiec1, choragiew1),
-            new("Tomasz", "Innyhufiec", "AB01", hufiec2, choragiew1),
-            new("Anna", "Nowak", "AA03", hufiec1, choragiew1),
+            new("Jan", "Kowalski", "AA01", hufiec1, choragiew1, hufiec1.Name),
+            new("Jan", "Kowalski", "AA02", hufiec1, choragiew1, hufiec1.Name),
+            new("Tomasz", "Innyhufiec", "AB01", hufiec2, choragiew1, "Drużyna testowa"),
+            new("Anna", "Nowak", "AA03", hufiec1, choragiew1, hufiec1.Name),
 
-            new("Anna", "Malinowska", "AA05", hufiec3, choragiew2),
+            new("Anna", "Malinowska", "AA05", hufiec3, choragiew2, hufiec3.Name),
 
-            new("Anna", "Abacka", "AA05", choragiew1, choragiew1),
-            new("Anna", "Cabacka", "AA05", choragiew1, choragiew1),
+            new("Anna", "Abacka", "AA05", choragiew1, choragiew1, choragiew1.Name),
+            new("Anna", "Cabacka", "AA05", choragiew1, choragiew1, choragiew1.Name),
         }.ToAsyncEnumerable();
 }
