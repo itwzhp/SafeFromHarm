@@ -62,14 +62,25 @@ internal class SmtpNotificationSender(
         {
             b.AppendLine("""
                 Oto lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>nie ukończyli</strong> obowiązkowego szkolenia z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych, a tym samym nie posiadają ważnego certyfikatu "Safe From Harm":
-                <ol>
+                <ul>
                 """);
 
-            foreach (var member in missingCertificationMembers)
-                b.AppendLine($"<li>{member.FirstName} {member.LastName} ({member.MembershipNumber}) - {member.AllocationUnitName}</li>");
+            var groupedByUnit = missingCertificationMembers
+                .GroupBy(m => m.AllocationUnitName)
+                .OrderBy(g => g.Key);
+
+            foreach (var group in groupedByUnit)
+            {
+                b.AppendLine($"<li><strong>{group.Key}</strong><ol>");
+
+                foreach (var member in group)
+                    b.AppendLine($"<li>   {member.FirstName} {member.LastName} ({member.MembershipNumber})</li>");
+
+                b.AppendLine("</ol></li>");
+            }
 
             b.AppendLine("""
-                    </ol>
+                    </ul>
                     <p>Poproś ich o ukończenie e-szkolenia i wypełnienie testu w <a href="https://edu.zhp.pl/course/view.php?id=47">Harcerskim Serwisie Szkoleniowym</a>.
                     Jeśli ta informacja jest błędna, wypełnij <a href="https://jira.zhp.pl/plugins/servlet/desk/portal/9/create/101">formularz na helpdesku</a></p>
                     """);
@@ -79,14 +90,25 @@ internal class SmtpNotificationSender(
         {
             b.AppendLine("""
                 Poniżej znajduje się lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>ukończyli</strong> obowiązkowe szkolenie:
-                <ol>
+                <ul>
                 """);
 
-            foreach (var (member, certificationDate) in certifiedMembers)
-                b.AppendLine($"<li>{member.FirstName} {member.LastName} ({member.MembershipNumber}) - {certificationDate:dd.MM.yyyy}, {member.AllocationUnitName}</li>");
-            
+            var groupedByUnit = certifiedMembers
+                .GroupBy(m => m.Member.AllocationUnitName)
+                .OrderBy(g => g.Key);
+
+            foreach (var group in groupedByUnit)
+            {
+                b.AppendLine($"<li><strong>{group.Key}</strong><ol>");
+
+                foreach (var (member, certificationDate) in group)
+                    b.AppendLine($"<li>   {member.FirstName} {member.LastName} ({member.MembershipNumber}) - {certificationDate:dd.MM.yyyy}</li>");
+
+                b.AppendLine("</ol></li>");
+            }
+
             b.AppendLine("""
-               </ol>
+               </ul>
                Informacja o posiadaniu certyfikatu Safe from Harm powinna znaleźć się w Tipi w sekcji "Kursy, szkolenia i uprawnienia".
                """);
         }
