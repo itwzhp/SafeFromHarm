@@ -20,7 +20,7 @@ internal static class MoodleHostBuilderExtensions
             {
                 var options = serviceProvider.GetRequiredService<IOptions<MoodleOptions>>().Value;
 
-                client.Timeout = TimeSpan.FromMinutes(5);
+                client.Timeout = TimeSpan.FromMinutes(10);
 
                 if (string.IsNullOrEmpty(options.MoodleHostName))
                 {
