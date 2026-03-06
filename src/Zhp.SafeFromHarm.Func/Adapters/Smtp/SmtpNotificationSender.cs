@@ -82,7 +82,7 @@ internal class SmtpNotificationSender(
             b.AppendLine("""
                     </ul>
                     <p>Poproś ich o ukończenie e-szkolenia i wypełnienie testu w <a href="https://edu.zhp.pl/course/view.php?id=47">Harcerskim Serwisie Szkoleniowym</a>.
-                    Jeśli ta informacja jest błędna, wypełnij <a href="https://jira.zhp.pl/plugins/servlet/desk/portal/9/create/101">formularz na helpdesku</a></p>
+                    Jeśli ta informacja jest błędna, wypełnij <a href="https://jira.zhp.pl/plugins/servlet/desk/portal/7/create/208">formularz na helpdesku</a></p>
                     """);
         }
 
