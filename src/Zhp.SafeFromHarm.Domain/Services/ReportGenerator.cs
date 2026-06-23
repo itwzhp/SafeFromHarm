@@ -13,15 +13,11 @@ public class ReportGenerator(
     
     public async Task SendReports(string? onlySendToEmail, CancellationToken cancellationToken)
     {
-        var originalReport = await reportProvider.GetReport(cancellationToken);
+        var reports = await reportProvider.GetReport(cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var filteredReport = onlySendToEmail == null
-           ? originalReport
-           : new CertificationReport(originalReport.Entries.Where(m => m.Member.Department.Email == onlySendToEmail).ToList());
-
-        var reportsToSend = filteredReport.Entries
+        var reportsToSend = reports.Entries
             .Where(m => m.Member.Department.Id != HeadquartersId)
             .GroupBy(m => m.Member.Department);
 
@@ -29,6 +25,9 @@ public class ReportGenerator(
 
         foreach (var report in reportsToSend)
         {
+            if (onlySendToEmail != null && report.Key.Email != onlySendToEmail)
+                continue;
+
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
@@ -40,10 +39,11 @@ public class ReportGenerator(
             }
         }
 
-        await sender.SendCentralReport(originalReport);
+        if (onlySendToEmail == null)
+            await sender.SendCentralReport(reports);
         
         cancellationToken.ThrowIfCancellationRequested();
 
-        await summarySender.SendCentralReport(originalReport, onlySendToEmail, failedRecipients);
+        await summarySender.SendCentralReport(reports, onlySendToEmail, failedRecipients);
     }
 }

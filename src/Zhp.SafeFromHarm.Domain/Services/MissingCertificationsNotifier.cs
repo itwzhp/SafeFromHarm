@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Zhp.SafeFromHarm.Domain.Helpers;
-using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Domain.Services;
@@ -13,22 +12,21 @@ public class MissingCertificationsNotifier(
 {
     public async Task SendNotificationsOnMissingCertificates(string? onlySendToEmail, CancellationToken cancellationToken)
     {
-        var originalReport = await reportProvider.GetReport(cancellationToken);
+        var report = await reportProvider.GetReport(cancellationToken);
 
-        var filteredReport = onlySendToEmail == null
-            ? originalReport
-            : new CertificationReport([.. originalReport.Entries.Where(m => m.Member.Supervisor.Email == onlySendToEmail)]);
-
-        var notificationsToSend = filteredReport.Entries
+        var notificationsToSend = report.Entries
             .GroupBy(m => (m.Member.Supervisor, m.Member.Department));
 
-        var membersPerDepartment = filteredReport.Entries
+        var membersPerDepartment = report.Entries
             .ToLookup(m => m.Member.Department);
 
         var failedRecipients = new List<(string Email, string UnitName)>();
 
         foreach(var notification in notificationsToSend)
         {
+            if(onlySendToEmail != null && notification.Key.Supervisor.Email != onlySendToEmail)
+                continue;
+
             cancellationToken.ThrowIfCancellationRequested();
 
             var groupedByCert = notification.ToLookup(n => n.CertificationDate.HasValue);
@@ -48,6 +46,6 @@ public class MissingCertificationsNotifier(
             }
         }
 
-        await summarySender.SendSummary(originalReport.NumberCertified, originalReport.NumberNotCertified, onlySendToEmail, failedRecipients);
+        await summarySender.SendSummary(report.NumberCertified, report.NumberNotCertified, onlySendToEmail, failedRecipients);
     }
 }

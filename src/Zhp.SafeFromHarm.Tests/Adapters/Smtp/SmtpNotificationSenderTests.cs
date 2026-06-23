@@ -125,7 +125,7 @@ public class SmtpNotificationSenderTests
         attachment.ContentType.ToString().Should().Contain("text/csv");
 
         using var stream = new MemoryStream();
-        attachment.WriteTo(stream, true);
+        attachment.WriteTo(stream, true, TestContext.Current.CancellationToken);
         stream.Length.Should().BePositive();
         stream.GetBuffer().Should().StartWith([..Encoding.ASCII.GetBytes($"{escapedBom}Imie")]);
     }

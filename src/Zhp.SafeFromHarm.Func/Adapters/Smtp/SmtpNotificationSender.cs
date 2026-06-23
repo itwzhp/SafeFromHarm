@@ -107,10 +107,7 @@ internal class SmtpNotificationSender(
                 b.AppendLine("</ol></li>");
             }
 
-            b.AppendLine("""
-               </ul>
-               Informacja o posiadaniu certyfikatu Safe from Harm powinna znaleźć się w Tipi w sekcji "Kursy, szkolenia i uprawnienia".
-               """);
+            b.AppendLine("</ul>");
         }
 
         if (addAttachmentReport)

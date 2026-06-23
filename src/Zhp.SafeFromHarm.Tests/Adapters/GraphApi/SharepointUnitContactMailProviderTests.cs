@@ -16,7 +16,7 @@ public class SharepointUnitContactMailProviderTests
     [Fact(Skip = "This is integration test! Don't run automatically")]
     public async Task GK_ProperResults()
     {
-        var result = await subject.GetEmailAddresses(2).ToListAsync();
+        var result = await subject.GetEmailAddresses(2).ToListAsync(TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle();
     }

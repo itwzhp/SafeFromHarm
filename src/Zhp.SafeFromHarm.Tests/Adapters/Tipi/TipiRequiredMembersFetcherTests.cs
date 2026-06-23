@@ -110,7 +110,7 @@ public class TipiRequiredMembersFetcherTests
         """;
         var subject = BuildSubject();
 
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
 
         result.Should().BeEquivalentTo(new MemberToCertify[]
         {
@@ -156,7 +156,7 @@ public class TipiRequiredMembersFetcherTests
         """;
         var subject = BuildSubject();
 
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("choragiew@dolnoslaska.zhp.pl");
     }
@@ -182,7 +182,7 @@ public class TipiRequiredMembersFetcherTests
         """;
         var subject = BuildSubject("fallback@zhp.pl");
 
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("fallback@zhp.pl");
     }
@@ -208,7 +208,7 @@ public class TipiRequiredMembersFetcherTests
         """;
         var subject = BuildSubject("fallback@zhp.pl");
 
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("chelm@zhp.pl");
     }
@@ -246,7 +246,7 @@ public class TipiRequiredMembersFetcherTests
         """;
         var subject = BuildSubject(null);
 
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("radomsko@zhp.pl");
     }
@@ -296,7 +296,7 @@ public class TipiRequiredMembersFetcherTests
         """;
         var subject = BuildSubject(null);
 
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync();
+        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle().Which.MembershipNumber.Should().Be("AA02");
     }

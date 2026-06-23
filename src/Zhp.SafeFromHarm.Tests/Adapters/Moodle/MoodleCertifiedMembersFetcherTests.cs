@@ -13,7 +13,7 @@ public class MoodleCertifiedMembersFetcherTests
     {
         var result = subject.GetCertifiedMembers();
 
-        (await result.ToListAsync()).Should().BeEquivalentTo(new Certification[]
+        (await result.ToListAsync(TestContext.Current.CancellationToken)).Should().BeEquivalentTo(new Certification[]
         {
             new("jan.kowalski@zhp.example.com", new(2023, 8, 29)),
             new("katarzyna.nazwisko@zhp.example.com", new(2023, 9, 8)),
