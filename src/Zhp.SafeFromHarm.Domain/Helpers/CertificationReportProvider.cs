@@ -20,9 +20,9 @@ public class CertificationReportProvider(
         var certifiedMembers = await certifiedMembersFetcher
             .GetCertifiedMembers()
             .Where(m => m.CertificationDate >= cerificationExpiryThreshold)
-            .SelectAwait(async m => (membershipId: await numberMapper.GetMembershipNumberForEmail(m.EmailAddress), certificationDate: m.CertificationDate))
+            .Select(async (Certification m, CancellationToken ct) => (membershipId: await numberMapper.GetMembershipNumberForEmail(m.EmailAddress), certificationDate: m.CertificationDate))
             .Where(m => !string.IsNullOrEmpty(m.membershipId))
-            .GroupBy(m => m.membershipId).SelectAwait(async g => await g.FirstAsync()) //Distinct by membership id
+            .GroupBy(m => m.membershipId).Select(g => g.First()) //Distinct by membership id
             .ToDictionaryAsync(m => m.membershipId!, m => (DateOnly?)m.certificationDate, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();

@@ -1,0 +1,82 @@
+# CLAUDE.md
+
+Ten plik dostarcza wskazówek dla Claude Code (claude.ai/code) do pracy z kodem w tym repozytorium.
+
+## Co to jest
+
+Aplikacja Azure Functions (.NET 10, isolated worker) wspierająca wdrażanie polityki "Safe from Harm" w ZHP. Trzy funkcje:
+
+- **Zakładanie kont** — zakłada konta w Moodle dla osób bez konta pocztowego ZHP (głównie seniorzy zdający egzamin na miejscu, na komputerze hufca/chorągwi). Wywoływana przez frontend, uwierzytelniana przez Entra ID.
+- **Powiadomienia o brakującej certyfikacji** — zestawia, kto *musi* być certyfikowany (Tipi), z tym, kto *jest* certyfikowany (Moodle), i mailuje jednostkom o brakach.
+- **Raporty chorągwiane** — co tydzień (poniedziałek) wysyła każdej chorągwi raport (HTML + załącznik CSV) stanu certyfikacji, a zespołowi kontrolującemu — raport zbiorczy dla całego związku.
+
+Język domenowy jest polski i przenika do identyfikatorów, komentarzy oraz treści maili: *hufiec*, *chorągiew*, *GK* (Główna Kwatera), *przydział*, *numer ewidencyjny*. Nowe teksty widoczne dla użytkownika pisz po polsku.
+
+## Komendy
+
+```powershell
+dotnet build src/Zhp.SafeFromHarm.sln
+dotnet test src/Zhp.SafeFromHarm.sln
+dotnet test src/Zhp.SafeFromHarm.sln --filter "FullyQualifiedName~MoodleAccountCreatorTests"   # pojedyncza klasa testowa
+dotnet test src/Zhp.SafeFromHarm.sln --filter "FullyQualifiedName~MissingCertificationsNotifierTests.SendNotificationsOnMissingCertificates_FindsRequiredMembers"
+
+func start --port 7292                    # uruchomienie funkcji lokalnie, z src/Zhp.SafeFromHarm.Func (wymaga Azurite dla AzureWebJobsStorage)
+npm --prefix frontend start               # statyczny frontend na http://localhost:5000
+```
+
+`dotnet test` działa w trybie MTP (`"test": { "runner": "Microsoft.Testing.Platform" }` w [global.json](global.json)), bo xunit.v3 to natywny projekt MTP, a `dotnet test` w .NET 10 nie mostkuje już takich projektów przez VSTest. `--filter` działa tak samo jak wcześniej.
+
+Sekrety lokalne trafiają do user secrets projektu Func, nigdy do `appsettings.Development.json`:
+
+```powershell
+dotnet user-secrets set Smtp:Username <username> --project src/Zhp.SafeFromHarm.Func
+dotnet user-secrets set Smtp:Password <password> --project src/Zhp.SafeFromHarm.Func
+dotnet user-secrets set Moodle:MoodleToken <token> --project src/Zhp.SafeFromHarm.Func
+dotnet user-secrets set Tipi:TokenId <id> --project src/Zhp.SafeFromHarm.Func
+dotnet user-secrets set Tipi:TokenSecret <secret> --project src/Zhp.SafeFromHarm.Func
+```
+
+## Architektura — porty i adaptery
+
+Trzy projekty w `src/`:
+
+- `Zhp.SafeFromHarm.Domain` — serwisy orkiestrujące (`AccountCreator`, `MissingCertificationsNotifier`, `ReportGenerator`), współdzielony helper `CertificationReportProvider`, rekordy modelu i **wszystkie** interfejsy `Ports/*`. Zależy tylko od logowania/options oraz `System.Linq.AsyncEnumerable` z BCL (bez pakietu `System.Linq.Async` — jego nazewnictwo `SelectAwait`/`Select` koliduje z typem z BCL na net10.0; asynchroniczne przeciążenia `Select`/`Where` wymagają teraz jawnego parametru `CancellationToken`, żeby dowiązać się do właściwej metody — patrz [CertificationReportProvider.cs](src/Zhp.SafeFromHarm.Domain/Helpers/CertificationReportProvider.cs)).
+- `Zhp.SafeFromHarm.Func` — triggery Azure Functions (cienkie: parsują body, wołają serwis domenowy) plus po jednym folderze adapterów na system zewnętrzny: `Tipi/`, `Moodle/`, `GraphApi/`, `Smtp/`, `TestDummy/`.
+- `Zhp.SafeFromHarm.Tests` — xUnit v3 + FluentAssertions + NSubstitute. `InternalsVisibleTo` pozwala testom sięgać do adapterów `internal`.
+
+**Wybór adaptera jest sterowany konfiguracją.** [HostExtensionMethods.cs](src/Zhp.SafeFromHarm.Func/Infrastructure/HostExtensionMethods.cs) czyta sekcję `Toggles` do `AdapterTogglesOptions`, a jego helper `AddSwitch` mapuje każdą wartość tekstową na rejestrację (np. `MembersFetcher: "Tipi" | "Dummy"`). Nieznana wartość rzuca wyjątkiem przy starcie. Dodając implementację portu, trzeba: dopisać case do właściwego słownika `AddSwitch`, dodać ustawienie do [zhp-safefromharm.bicep](zhp-safefromharm.bicep) (`Toggles__<Klucz>`, podwójny podkreślnik) i — do developmentu lokalnego — do [appsettings.Development.json](src/Zhp.SafeFromHarm.Func/appsettings.Development.json). `AccountCreationResultPublishers` to jedyny toggle *listowy* (rejestrowane i uruchamiane są wszystkie wymienione publishery).
+
+Adaptery `TestDummy/` to nie fixture'y testowe — to pełnoprawne rejestracje używane zarówno przez `appsettings.Development.json` (żeby lokalne uruchomienia nie mailowały prawdziwych jednostek), jak i przez testy jednostkowe domeny jako źródła danych.
+
+`AspectTests/DependencyInjectionTests` buduje prawdziwy host dla każdej klasy Function i go rozwiązuje, więc zepsuta rejestracja albo nieprzechodząca `.Validate(...)` w options wywala testy zamiast produkcyjnego startu. `FunctionTriggerChecks` sprawdza, że żaden timer trigger nie ma `RunOnStartup`.
+
+### Przepływ danych raportu certyfikacji
+
+`CertificationReportProvider` jest współdzielony przez obie funkcje certyfikacyjne: pobiera zdane oceny z kursu Moodle (`SfhCourseId`, domyślnie 47) → odrzuca certyfikacje starsze niż `SafeFromHarm:CertificateExpiryDays` (domyślnie ~3 lata) → mapuje e-mail z Moodle na numer ewidencyjny przez Entra ID (`employeeType` zaczyna się od `Tipi`, `employeeId` = numer ewidencyjny) → łączy z listą osób wymaganych do certyfikacji z Tipi. Konta zakładane przez tę aplikację mają syntetyczny mail `<numerEwidencyjny>@sfh.fake-mail.zhp.pl` (starsza wersja: `@example.zhp.pl`), co mapper rozpoznaje bez odpytywania Entra ID.
+
+Dwa różne pola jednostki sterują routingiem: `Supervisor` (hufiec, w razie braku — chorągiew/GK) dostaje *powiadomienie*; `Department` (chorągiew albo GK) dostaje *raport regionalny*. `ReportGenerator` pomija `Department.Id == 2` (Główna Kwatera).
+
+### Systemy zewnętrzne
+
+| System | Uwierzytelnienie | Uwagi |
+|---|---|---|
+| Tipi (`tipi-api.zhp.pl`) | Nagłówki Cloudflare Access `CF-Access-Client-Id`/`Secret` | Retry Polly: 5 × 2 s. Pusty wynik jest traktowany jako błąd, nie jako "nikogo do certyfikacji". |
+| Moodle (`edu.zhp.pl`) | `wstoken` w query stringu | Timeout HttpClient 10 min; żądania idą pod `MoodleHostName` z nadpisanym nagłówkiem `Host`, żeby obejść 100-sekundowy limit Cloudflare. Moodle zwraca HTTP 200 nawet przy błędach, więc `MoodleClient` wykrywa je po polu `exception` w body. |
+| Microsoft Graph | `ManagedIdentityCredential` na Azure, `InteractiveBrowserCredential` w Development | Lista użytkowników z Entra ID + dwie listy SharePoint (założone konta, kontakty jednostek). |
+| SMTP (`mail-auto-mx.zhp.pl`) | użytkownik/hasło | `Smtp:OverrideRecipient` przekierowuje *całą* pocztę na jeden adres testowy. Każde ciało HTML musi mieć też wersję tekstową przez `SmtpHelper.ClearHtml`. |
+
+### Triggery
+
+`CreateAccounts` ma `AuthorizationLevel.Anonymous` — jest chroniona przez App Service Easy Auth i sama sprawdza, czy nagłówek `X-MS-CLIENT-PRINCIPAL-NAME` zgadza się z `RequestorEmail` w body. Pozostałe dwie to triggery HTTP `AuthorizationLevel.Function` plus bliźniaczy timer: `FindMissingRequiredCertifications` co miesiąc (28. dnia), `GenerateReports` co tydzień (poniedziałki). Ręczne wywołania HTTP przyjmują `{"RecipientFilter": "*"}` dla wszystkich albo mail jednej jednostki, żeby zaadresować tylko ją.
+
+## Zależności NuGet
+
+Wszystkie pakiety są na bieżąco (`dotnet list package --outdated` czyste). Warte odnotowania:
+
+- `Microsoft.Graph` 6.x i `Microsoft.Identity.Web.MicrosoftGraph` 4.x — duży skok wersji major, ale w kodzie nie ma żadnego bezpośredniego użycia namespace'u `Microsoft.Identity.Web` (tylko `Microsoft.Graph`/`Azure.Identity`), więc build i testy przeszły bez zmian w kodzie.
+- `FluentAssertions` 8.x zmienił licencję (Xceed) — bezpłatny dla projektów non-profit/edukacyjnych/indywidualnych, płatny dla firm komercyjnych powyżej pewnego progu przychodu. Warto to mieć na uwadze, jeśli repozytorium kiedyś zmieni właściciela na komercyjny.
+- `xunit.v3`/`xunit.runner.visualstudio` muszą iść w parze z `global.json` (patrz sekcja Komendy) — to one wymusiły przejście na tryb MTP.
+
+## Deployment
+
+Push na `master` wdraża automatycznie: [.github/workflows/build-and-deploy.yaml](.github/workflows/build-and-deploy.yaml) buduje, testuje, waliduje i aplikuje `zhp-safefromharm.bicep` w trybie **Complete**, po czym publikuje Function App. Bicep jest źródłem prawdy dla app settings — cokolwiek ustawione tylko w Portalu Azure zostanie skasowane przy kolejnym deployu. Frontend (`frontend/`, czysty jQuery + MSAL, bez build stepu) jest wdrażany osobno przez CloudFlare Pages i jest wykluczony z filtrów ścieżek workflow.

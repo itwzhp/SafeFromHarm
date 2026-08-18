@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "clean (functions)",
+            "command": "dotnet",
+            "args": [
+                "clean",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "type": "process",
+            "options": {
+                "cwd": "${workspaceFolder}/src/Zhp.SafeFromHarm.Func"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build (functions)",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "type": "process",
+            "options": {
+                "cwd": "${workspaceFolder}/src/Zhp.SafeFromHarm.Func"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            // Host startuje z katalogu wyjściowego builda - tam trafiają
+            // host.json, local.settings.json i appsettings.*.json.
+            "type": "func",
+            "dependsOn": "build (functions)",
+            "options": {
+                "cwd": "${workspaceFolder}/src/Zhp.SafeFromHarm.Func/bin/Debug/net10.0"
+            },
+            "command": "host start",
+            "args": [
+                "--dotnet-isolated-debug",
+                "--enable-json-output"
+            ],
+            "isBackground": true,
+            "problemMatcher": "$func-dotnet-watch"
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/Zhp.SafeFromHarm.sln"
+            ],
+            "type": "process",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

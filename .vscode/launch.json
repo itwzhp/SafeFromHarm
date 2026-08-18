@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Startuje hosta Functions (task "func: host start") i podpina debugger
+            // do procesu workera. Funkcje HTTP: http://localhost:7292/api/<nazwa>
+            "name": "Attach to .NET Functions",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:azureFunctions.pickProcess}"
+        }
+    ]
+}

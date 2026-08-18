@@ -17,7 +17,7 @@ internal class TipiRequiredMembersFetcher(
         var result = JsonSerializer.DeserializeAsyncEnumerable<ResultEntry>(stream)
             ?? throw new Exception("Received null result from Tipi");
 
-        var members = await result.SelectAwait(MapAsync).OfType<MemberToCertify>().ToListAsync();
+        var members = await result.Select(MapAsync).OfType<MemberToCertify>().ToListAsync();
         if (members.Count == 0)
             throw new Exception("Received empty results from Tipi");
 
@@ -25,7 +25,7 @@ internal class TipiRequiredMembersFetcher(
             yield return member;
     }
 
-    private async ValueTask<MemberToCertify?> MapAsync(ResultEntry? entry)
+    private async ValueTask<MemberToCertify?> MapAsync(ResultEntry? entry, CancellationToken cancellationToken)
     {
         if (entry == null)
             return null;

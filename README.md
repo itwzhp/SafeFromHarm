@@ -13,5 +13,8 @@ Ta funkcja służy do poinformowania jednostek, kto powinien przejść certyfika
 
 Funkcja jest uruchamiana raz na miesiąc (28 dzień miesiąca). Można też uruchomić ją ręcznie triggerem HTTP. Poprzez trigger należy przekazać body `{"RecipientFilter": "*"}`, aby wysłać do wszystkich. Można też podać tam jakiegoś maila, aby wysłać tylko mail do jednej jednostki.
 
+## Raporty chorągwiane
+Ta funkcja co tydzień (w poniedziałek) wysyła do każdej chorągwi raport (HTML + załącznik CSV) ze stanem certyfikacji wszystkich osób z jej obszaru, a do zespołu kontrolującego - raport zbiorczy dla całego związku. Podobnie jak wyżej, można ją też odpalić ręcznie triggerem HTTP z tym samym body `{"RecipientFilter": "*"}` (lub adresem jednej chorągwi).
+
 # Rozwój i deployment
-Aplikacja jest napisana w Azure Functions w .NET 8. Wgranie zmiany na branch `master` automatycznie powoduje wgranie jej na produkcję. Za wdrożenie backendu odpowiada GitHub Actions, a frontendu - CloudFlare Pages.
+Aplikacja jest napisana w Azure Functions w .NET 10. Wgranie zmiany na branch `master` automatycznie powoduje wgranie jej na produkcję. Za wdrożenie backendu odpowiada GitHub Actions, a frontendu - CloudFlare Pages.

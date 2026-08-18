@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "Msal"
-    ]
+    ],
+    "azureFunctions.projectLanguage": "C#",
+    "azureFunctions.projectRuntime": "~4",
+    "azureFunctions.projectSubpath": "src/Zhp.SafeFromHarm.Func"
 }
