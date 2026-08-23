@@ -8,7 +8,7 @@ internal class TipiMembersFetcher(HttpClient httpClient) : IMembersFetcher
 {
     public async Task<Member?> GetMember(string membershipId, CancellationToken cancellationToken)
     {
-        using var response = await httpClient.GetAsync($"memberdetails/{membershipId}", cancellationToken);
+        using var response = await httpClient.GetAsync($"sfh/memberdetails/{membershipId}", cancellationToken);
 
         if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
             return null;
@@ -17,11 +17,9 @@ internal class TipiMembersFetcher(HttpClient httpClient) : IMembersFetcher
         var result = (await JsonSerializer.DeserializeAsync<MemberDto>(stream, cancellationToken: cancellationToken))
             ?? throw new Exception("Received null result from Tipi");
 
-        return result.activeMember
-            ? new(result.firstName, result.lastName, result.memberId)
-            : null;
+        return new(result.firstName, result.lastName, result.memberId);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used to map json")]
-    private record MemberDto(string memberId, string firstName, string lastName, bool activeMember);
+    private record MemberDto(string memberId, string firstName, string lastName);
 }

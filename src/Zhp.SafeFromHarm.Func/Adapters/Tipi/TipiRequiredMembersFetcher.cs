@@ -10,7 +10,7 @@ internal class TipiRequiredMembersFetcher(
 {
     public async IAsyncEnumerable<MemberToCertify> GetMembersRequiredToCertify()
     {
-        using var response = await httpClient.GetAsync("sfhmembersfortrainig");
+        using var response = await httpClient.GetAsync("sfh/members-for-training");
         response.EnsureSuccessStatusCode();
 
         using var stream = await response.Content.ReadAsStreamAsync();
