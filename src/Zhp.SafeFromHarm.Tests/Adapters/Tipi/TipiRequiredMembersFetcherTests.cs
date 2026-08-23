@@ -13,38 +13,32 @@ public class TipiRequiredMembersFetcherTests
     public TipiRequiredMembersFetcherTests()
     {
         httpClient = new(httpHandler) { BaseAddress = new("https://example.zhp.pl") };
-        httpHandler.ResponseBody["/orgunit"] = """
+        httpHandler.ResponseBody["/sfh/orgunit"] = """
         [
             {
                 "orgunitId": 2657,
                 "name": "Hufiec Radomsko",
-                "primaryEmail": "radomsko@zhp.pl"
+                "email": "radomsko@zhp.pl"
             },
             {
                 "orgunitId": 6127,
                 "name": "Hufiec Ziemi Cieszyńskiej",
-                "primaryEmail": "cieszyn@zhp.pl"
+                "email": "cieszyn@zhp.pl"
             },
             {
                 "orgunitId": 5967,
                 "name": "Chorągiew Śląska",
-                "primaryEmail": "choragiew@dolnoslaska.zhp.pl;biuro@slaska.zhp.pl"
+                "email": "choragiew@dolnoslaska.zhp.pl"
             },
             {
                 "orgunitId": 20006,
                 "name": "Hufiec ZHP Powiatu Milickiego",
-                "primaryEmail": null
+                "email": null
             },
             {
                 "orgunitId": 2031,
                 "name": "Chorągiew Łódzka",
-                "primaryEmail": "lodzka@zhp.pl"
-            },
-            {
-        	    "orgunitId": 1416,
-        	    "name": "Hufiec Chełm",
-        	    "primaryEmail": null,
-        	    "extraEmails": "chelm@zhp.pl;biuro@example.zhp.pl"
+                "email": "lodzka@zhp.pl"
             }
         ]
         """;
@@ -58,7 +52,7 @@ public class TipiRequiredMembersFetcherTests
     [Fact]
     public async Task EmptyResults_Exception()
     {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = "[]";
+        httpHandler.ResponseBody["/sfh/members-for-training"] = "[]";
         var subject = BuildSubject();
 
         await subject.Awaiting(s => s.GetMembersRequiredToCertify().ToListAsync())
@@ -68,7 +62,7 @@ public class TipiRequiredMembersFetcherTests
     [Fact]
     public async Task SomeResults_MapsProperly()
     {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
+        httpHandler.ResponseBody["/sfh/members-for-training"] = """
         [
             {
             	"memberId": "AA01",
@@ -136,35 +130,9 @@ public class TipiRequiredMembersFetcherTests
     }
 
     [Fact]
-    public async Task DuplicateMail_TakesFirst()
-    {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
-        [
-            {
-        	    "memberId": "AB123",
-        	    "personId": 111,
-        	    "firstName": "Jan",
-        	    "lastName": "Kowalski",
-        	    "birthdate": -446086800,
-                "allocationUnitName": "Chorągiew Śląska",
-                "allocationUnitId": 5967,
-                "memberRoles": null,
-                "hufiecId": null,
-                "choragiewId": 5967
-            }
-        ]
-        """;
-        var subject = BuildSubject();
-
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
-
-        result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("choragiew@dolnoslaska.zhp.pl");
-    }
-
-    [Fact]
     public async Task NullMail_SetsFallback()
     {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
+        httpHandler.ResponseBody["/sfh/members-for-training"] = """
         [
             {
         	    "memberId": "BD1",
@@ -188,35 +156,9 @@ public class TipiRequiredMembersFetcherTests
     }
 
     [Fact]
-    public async Task NullPrimaryMail_SetsSecondaryMail()
-    {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
-        [
-            {
-        	    "memberId": "BD1",
-        	    "personId": 370645,
-        	    "firstName": "Anna",
-        	    "lastName": "Kowalska",
-        	    "birthdate": 1012518000,
-                "allocationUnitName": "Hufiec Ziemi Cieszyńskiej",
-                "allocationUnitId": 6127,
-                "memberRoles": null,
-                "hufiecId": 1416,
-                "choragiewId": 5967
-            }
-        ]
-        """;
-        var subject = BuildSubject("fallback@zhp.pl");
-
-        var result = await subject.GetMembersRequiredToCertify().ToArrayAsync(TestContext.Current.CancellationToken);
-
-        result.Should().ContainSingle().Which.Supervisor.Email.Should().Be("chelm@zhp.pl");
-    }
-
-    [Fact]
     public async Task NullMailNullFallback_DoesntReturnItem()
     {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
+        httpHandler.ResponseBody["/sfh/members-for-training"] = """
         [
             {
         	    "memberId": "BD1",
@@ -254,7 +196,7 @@ public class TipiRequiredMembersFetcherTests
     [Fact]
     public async Task NullUnit_DoesntReturnItem()
     {
-        httpHandler.ResponseBody["/sfhmembersfortrainig"] = """
+        httpHandler.ResponseBody["/sfh/members-for-training"] = """
         [
             {
             	"memberId": "AA01",
