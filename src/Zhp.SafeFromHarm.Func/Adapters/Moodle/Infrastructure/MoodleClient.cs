@@ -9,7 +9,7 @@ internal class MoodleClient(HttpClient httpClient, IOptions<MoodleOptions> optio
     private readonly MoodleOptions options = options.Value;
     private readonly JsonSerializerOptions jsonSerializerOptions = new() { PropertyNamingPolicy = new MoodlePropertyNamingPolicy() };
 
-    public async ValueTask<T> CallMoodle<T>(MoodleFunctions function, Dictionary<string, object> parameters)
+    public async Task<T> CallMoodle<T>(MoodleFunctions function, Dictionary<string, object> parameters)
     {
         using var body = new FormUrlEncodedContent(parameters.Select(p => KeyValuePair.Create(p.Key, p.Value.ToString())));
         var uri = $"webservice/rest/server.php?wstoken={options.MoodleToken}&wsfunction={function}&moodlewsrestformat=json";

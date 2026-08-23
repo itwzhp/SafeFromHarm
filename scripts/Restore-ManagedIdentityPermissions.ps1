@@ -318,19 +318,30 @@ if ($GrantDeploymentStorageRole) {
     }
 
     $scope = "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroup/providers/Microsoft.Storage/storageAccounts/$StorageAccountName"
+    $storageRole = 'Storage Blob Data Contributor'
 
-    $existingRole = (& az role assignment list --assignee-object-id $principalId --scope $scope `
-            --role 'Storage Blob Data Contributor' --output json 2>&1) | Out-String
+    # Stderr celowo nie jest laczony ze stdout: ostrzezenie z az zanieczysciloby JSON.
+    $roleJson = (& az role assignment list --assignee-object-id $principalId --scope $scope `
+            --role $storageRole --output json) | Out-String
 
-    if ($LASTEXITCODE -eq 0 -and ($existingRole | ConvertFrom-Json).Count -gt 0) {
-        Write-Skip 'Storage Blob Data Contributor — juz nadane'
+    if ($LASTEXITCODE -ne 0) {
+        throw "Nie udalo sie odczytac przypisan roli na $scope. Sprawdz, czy konto magazynu '$StorageAccountName' istnieje w grupie '$ResourceGroup'."
     }
-    elseif ($PSCmdlet.ShouldProcess($scope, 'nadaj Storage Blob Data Contributor')) {
-        & az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal `
-            --role 'Storage Blob Data Contributor' --scope $scope --output none
-        if ($LASTEXITCODE -ne 0) { throw 'Nie udalo sie nadac roli Storage Blob Data Contributor.' }
 
-        Write-Ok 'Storage Blob Data Contributor — nadane'
+    $existingRoles = @()
+    if (-not [string]::IsNullOrWhiteSpace($roleJson)) {
+        $existingRoles = @($roleJson | ConvertFrom-Json)
+    }
+
+    if ($existingRoles.Count -gt 0) {
+        Write-Skip "$storageRole — juz nadane"
+    }
+    elseif ($PSCmdlet.ShouldProcess($scope, "nadaj $storageRole")) {
+        & az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal `
+            --role $storageRole --scope $scope --output none
+        if ($LASTEXITCODE -ne 0) { throw "Nie udalo sie nadac roli $storageRole." }
+
+        Write-Ok "$storageRole — nadane"
     }
 }
 
@@ -366,6 +377,19 @@ $finalGrant = $finalPermissions.value | Where-Object {
 
 if ($finalGrant) { Write-Ok "SharePoint: $($finalGrant.roles -join ', ') na $SharepointSiteId" }
 else { Write-Warning "BRAK grantu na site SharePoint $SharepointSiteId" }
+
+if ($GrantDeploymentStorageRole) {
+    $verifyJson = (& az role assignment list --assignee-object-id $principalId --scope $scope `
+            --role $storageRole --output json) | Out-String
+
+    $verifyRoles = @()
+    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($verifyJson)) {
+        $verifyRoles = @($verifyJson | ConvertFrom-Json)
+    }
+
+    if ($verifyRoles.Count -gt 0) { Write-Ok "$storageRole na koncie $StorageAccountName" }
+    else { Write-Warning "BRAK roli $storageRole na koncie $StorageAccountName" }
+}
 
 Write-Host ''
 Write-Host 'Gotowe. Uprawnienia aplikacyjne Graph potrafia propagowac sie do kilku minut —' -ForegroundColor Yellow

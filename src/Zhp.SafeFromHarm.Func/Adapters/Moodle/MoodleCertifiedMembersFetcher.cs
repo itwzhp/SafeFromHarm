@@ -12,20 +12,13 @@ internal class MoodleCertifiedMembersFetcher(MoodleClient client, IOptions<Moodl
 
     public async IAsyncEnumerable<Certification> GetCertifiedMembers()
     {
-        var gradeRequest = client.CallMoodle<GradeReport>(
+        var gradeResponse = await client.CallMoodle<GradeReport>(
             MoodleFunctions.gradereport_user_get_grade_items,
-            new() { ["courseid"] = options.SfhCourseId })
-            .AsTask();
+            new() { ["courseid"] = options.SfhCourseId });
 
-        var userRequest = client.CallMoodle<User[]>(
+        var userResponse = await client.CallMoodle<User[]>(
             MoodleFunctions.core_enrol_get_enrolled_users,
-            new() { ["courseid"] = options.SfhCourseId })
-            .AsTask();
-
-        await Task.WhenAll(gradeRequest, userRequest);
-
-        var gradeResponse = gradeRequest.Result;
-        var userResponse = userRequest.Result;
+            new() { ["courseid"] = options.SfhCourseId });
 
         var passingMembers = gradeResponse
             .UserGrades
