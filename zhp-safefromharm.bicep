@@ -191,14 +191,6 @@ resource functionApp 'Microsoft.Web/sites@2025-03-01' = {
 
         // ports for reports
         {
-          name: 'Toggles__CertifiedMembersFetcher'
-          value: 'Moodle'
-        }
-        {
-          name: 'Toggles__EmailMembershipNumberMapper'
-          value: 'Ms365'
-        }
-        {
           name: 'Toggles__RequiredMembersFetcher'
           value: 'Tipi'
         }

@@ -9,8 +9,8 @@ internal class DummyNotificationSender(ILogger<DummyNotificationSender> logger) 
     public Task NotifySupervisor(
         Unit supervisor,
         IEnumerable<MemberToCertify> missingCertificationMembers,
-        IEnumerable<CertifiedMember> certifiedMembers,
-        IEnumerable<CertificationReport.ReportEntry> allMembersIncludingSubunits)
+        IEnumerable<MemberToCertify> certifiedMembers,
+        IEnumerable<MemberToCertify> allMembersIncludingSubunits)
     {
         if(logger.IsEnabled(LogLevel.Debug))
             logger.LogDebug("Simulating e-mail to {supervisorUnitMail} <{supervisorEmail}>, list of missing members: {members}, list of certified members: {certMembers}. All members count: {allMembersCount}",

@@ -13,10 +13,6 @@ internal class AdapterTogglesOptions
 
     // Certification notifications
 
-    public string CertifiedMembersFetcher { get; init; } = string.Empty;
-
-    public string EmailMembershipNumberMapper { get; init; } = string.Empty;
-
     public string RequiredMembersFetcher { get; init; } = string.Empty;
 
     public string NotificationSender { get; init; } = string.Empty;

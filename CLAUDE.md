@@ -7,7 +7,7 @@ Ten plik dostarcza wskazówek dla Claude Code (claude.ai/code) do pracy z kodem 
 Aplikacja Azure Functions (.NET 10, isolated worker) wspierająca wdrażanie polityki "Safe from Harm" w ZHP. Trzy funkcje:
 
 - **Zakładanie kont** — zakłada konta w Moodle dla osób bez konta pocztowego ZHP (głównie seniorzy zdający egzamin na miejscu, na komputerze hufca/chorągwi). Wywoływana przez frontend, uwierzytelniana przez Entra ID.
-- **Powiadomienia o brakującej certyfikacji** — zestawia, kto *musi* być certyfikowany (Tipi), z tym, kto *jest* certyfikowany (Moodle), i mailuje jednostkom o brakach.
+- **Powiadomienia o brakującej certyfikacji** — pobiera z Tipi listę osób, które *muszą* być certyfikowane, razem z datą ważności ich certyfikatu, i mailuje jednostkom, kto ma ważny certyfikat (i do kiedy), a kto nie.
 - **Raporty chorągwiane** — co tydzień (poniedziałek) wysyła każdej chorągwi raport (HTML + załącznik CSV) stanu certyfikacji, a zespołowi kontrolującemu — raport zbiorczy dla całego związku.
 
 Język domenowy jest polski i przenika do identyfikatorów, komentarzy oraz treści maili: *hufiec*, *chorągiew*, *GK* (Główna Kwatera), *przydział*, *numer ewidencyjny*. Nowe teksty widoczne dla użytkownika pisz po polsku.
@@ -40,11 +40,11 @@ dotnet user-secrets set Tipi:TokenSecret <secret> --project src/Zhp.SafeFromHarm
 
 Trzy projekty w `src/`:
 
-- `Zhp.SafeFromHarm.Domain` — serwisy orkiestrujące (`AccountCreator`, `MissingCertificationsNotifier`, `ReportGenerator`), współdzielony helper `CertificationReportProvider`, rekordy modelu i **wszystkie** interfejsy `Ports/*`. Zależy tylko od logowania/options oraz `System.Linq.AsyncEnumerable` z BCL (bez pakietu `System.Linq.Async` — jego nazewnictwo `SelectAwait`/`Select` koliduje z typem z BCL na net10.0; asynchroniczne przeciążenia `Select`/`Where` wymagają teraz jawnego parametru `CancellationToken`, żeby dowiązać się do właściwej metody — patrz [CertificationReportProvider.cs](src/Zhp.SafeFromHarm.Domain/Helpers/CertificationReportProvider.cs)).
+- `Zhp.SafeFromHarm.Domain` — serwisy orkiestrujące (`AccountCreator`, `MissingCertificationsNotifier`, `ReportGenerator`), rekordy modelu i **wszystkie** interfejsy `Ports/*`. Zależy tylko od logowania/options oraz `System.Linq.AsyncEnumerable` z BCL (bez pakietu `System.Linq.Async` — jego nazewnictwo `SelectAwait`/`Select` koliduje z typem z BCL na net10.0; asynchroniczne przeciążenia `Select`/`Where` wymagają teraz jawnego parametru `CancellationToken`, żeby dowiązać się do właściwej metody — patrz `MapAsync` w [TipiRequiredMembersFetcher.cs](src/Zhp.SafeFromHarm.Func/Adapters/Tipi/TipiRequiredMembersFetcher.cs)).
 - `Zhp.SafeFromHarm.Func` — triggery Azure Functions (cienkie: parsują body, wołają serwis domenowy) plus po jednym folderze adapterów na system zewnętrzny: `Tipi/`, `Moodle/`, `GraphApi/`, `Smtp/`, `TestDummy/`.
 - `Zhp.SafeFromHarm.Tests` — xUnit v3 + FluentAssertions + NSubstitute. `InternalsVisibleTo` pozwala testom sięgać do adapterów `internal`.
 
-**Wybór adaptera jest sterowany konfiguracją.** [HostExtensionMethods.cs](src/Zhp.SafeFromHarm.Func/Infrastructure/HostExtensionMethods.cs) czyta sekcję `Toggles` do `AdapterTogglesOptions`, a jego helper `AddSwitch` mapuje każdą wartość tekstową na rejestrację (np. `MembersFetcher: "Tipi" | "Dummy"`). Nieznana wartość rzuca wyjątkiem przy starcie. Dodając implementację portu, trzeba: dopisać case do właściwego słownika `AddSwitch`, dodać ustawienie do [zhp-safefromharm.bicep](zhp-safefromharm.bicep) (`Toggles__<Klucz>`, podwójny podkreślnik) i — do developmentu lokalnego — do [appsettings.Development.json](src/Zhp.SafeFromHarm.Func/appsettings.Development.json). `AccountCreationResultPublishers` to jedyny toggle *listowy* (rejestrowane i uruchamiane są wszystkie wymienione publishery).
+**Wybór adaptera jest sterowany konfiguracją.** [HostExtensionMethods.cs](src/Zhp.SafeFromHarm.Func/Infrastructure/HostExtensionMethods.cs) czyta sekcję `Toggles` do `AdapterTogglesOptions`, a jego helper `AddSwitch` mapuje każdą wartość tekstową na rejestrację (np. `MembersFetcher: "Tipi" | "Dummy"`). Nieznana wartość rzuca wyjątkiem przy starcie. Dodając implementację portu, trzeba: dopisać case do właściwego słownika `AddSwitch`, dodać ustawienie do [zhp-safefromharm.bicep](zhp-safefromharm.bicep) (`Toggles__<Klucz>`, podwójny podkreślnik) i — do developmentu lokalnego — do [appsettings.Development.json](src/Zhp.SafeFromHarm.Func/appsettings.Development.json). `AccountCreationResultPublishers` to jedyny toggle *listowy* (rejestrowane i uruchamiane są wszystkie wymienione publishery). `NotificationSender` razem z senderami rejestruje też `IUnitContactMailProvider` (`Smtp` → kontakty jednostek z listy SharePoint, `Dummy` → pusta lista), bo korzystają z niego wyłącznie senderzy SMTP.
 
 Adaptery `TestDummy/` to nie fixture'y testowe — to pełnoprawne rejestracje używane zarówno przez `appsettings.Development.json` (żeby lokalne uruchomienia nie mailowały prawdziwych jednostek), jak i przez testy jednostkowe domeny jako źródła danych.
 
@@ -52,7 +52,7 @@ Adaptery `TestDummy/` to nie fixture'y testowe — to pełnoprawne rejestracje u
 
 ### Przepływ danych raportu certyfikacji
 
-`CertificationReportProvider` jest współdzielony przez obie funkcje certyfikacyjne: pobiera zdane oceny z kursu Moodle (`SfhCourseId`, domyślnie 47) → odrzuca certyfikacje starsze niż `SafeFromHarm:CertificateExpiryDays` (domyślnie ~3 lata) → mapuje e-mail z Moodle na numer ewidencyjny przez Entra ID (`employeeType` zaczyna się od `Tipi`, `employeeId` = numer ewidencyjny) → łączy z listą osób wymaganych do certyfikacji z Tipi. Konta zakładane przez tę aplikację mają syntetyczny mail `<numerEwidencyjny>@sfh.fake-mail.zhp.pl` (starsza wersja: `@example.zhp.pl`), co mapper rozpoznaje bez odpytywania Entra ID.
+Obie funkcje certyfikacyjne pobierają przez `IRequiredMembersFetcher` z Tipi (`sfh/members-for-training`) listę osób wymaganych do certyfikacji, gdzie każda ma `certificateValidUntil` (`YYYY-MM-DD` albo `null` = brak certyfikatu), i budują z niej `CertificationReport`. Konstruktor raportu dostaje dzisiejszą datę i traktuje certyfikat po terminie ważności jak jego brak — to jedyne miejsce tej reguły. Jeden model `MemberToCertify` niesie zarówno dane osoby, jak i datę ważności — Moodle ani Entra ID nie biorą udziału w ustalaniu, kto jest certyfikowany. Brak pola `certificateValidUntil` w odpowiedzi Tipi kończy się wyjątkiem deserializacji (`[JsonRequired]`), żeby niezaktualizowane Tipi nie dało po cichu raportu „nikt nie ma certyfikatu”.
 
 Dwa różne pola jednostki sterują routingiem: `Supervisor` (hufiec, w razie braku — chorągiew/GK) dostaje *powiadomienie*; `Department` (chorągiew albo GK) dostaje *raport regionalny*. `ReportGenerator` pomija `Department.Id == 2` (Główna Kwatera).
 
@@ -62,7 +62,7 @@ Dwa różne pola jednostki sterują routingiem: `Supervisor` (hufiec, w razie br
 |---|---|---|
 | Tipi (`tipi-api.zhp.pl`) | Nagłówki Cloudflare Access `CF-Access-Client-Id`/`Secret` | Retry Polly: 5 × 2 s. Pusty wynik jest traktowany jako błąd, nie jako "nikogo do certyfikacji". |
 | Moodle (`edu.zhp.pl`) | `wstoken` w query stringu | Timeout HttpClient 10 min; żądania idą pod `MoodleHostName` z nadpisanym nagłówkiem `Host`, żeby obejść 100-sekundowy limit Cloudflare. Moodle zwraca HTTP 200 nawet przy błędach, więc `MoodleClient` wykrywa je po polu `exception` w body. |
-| Microsoft Graph | `ManagedIdentityCredential` na Azure, `InteractiveBrowserCredential` w Development | Lista użytkowników z Entra ID + dwie listy SharePoint (założone konta, kontakty jednostek). |
+| Microsoft Graph | `ManagedIdentityCredential` na Azure, `InteractiveBrowserCredential` w Development | Sprawdzanie konta pocztowego członka w Entra ID (zakładanie kont) + dwie listy SharePoint (założone konta, kontakty jednostek). |
 | SMTP (`mail-auto-mx.zhp.pl`) | użytkownik/hasło | `Smtp:OverrideRecipient` przekierowuje *całą* pocztę na jeden adres testowy. Każde ciało HTML musi mieć też wersję tekstową przez `SmtpHelper.ClearHtml`. |
 
 ### Triggery

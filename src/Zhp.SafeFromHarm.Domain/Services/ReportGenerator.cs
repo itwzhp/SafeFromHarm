@@ -1,25 +1,25 @@
-﻿using Zhp.SafeFromHarm.Domain.Helpers;
-using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
+﻿using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Domain.Services;
 
 public class ReportGenerator(
-    CertificationReportProvider reportProvider,
+    IRequiredMembersFetcher membersFetcher,
     IReportSender sender,
     ISummarySender summarySender)
 {
     const int HeadquartersId = 2;
-    
+
     public async Task SendReports(string? onlySendToEmail, CancellationToken cancellationToken)
     {
-        var reports = await reportProvider.GetReport(cancellationToken);
+        var members = await membersFetcher.GetMembersRequiredToCertify().ToListAsync(cancellationToken);
+        var reports = new CertificationReport(members, DateOnly.FromDateTime(DateTime.Today));
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var reportsToSend = reports.Entries
-            .Where(m => m.Member.Department.Id != HeadquartersId)
-            .GroupBy(m => m.Member.Department);
+        var reportsToSend = reports.Members
+            .Where(m => m.Department.Id != HeadquartersId)
+            .GroupBy(m => m.Department);
 
         List<Unit> failedRecipients = [];
 

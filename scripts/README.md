@@ -11,7 +11,7 @@ Skrypt jest idempotentny i wspiera `-WhatIf`.
 
 | Uprawnienie | Wartosc | Do czego |
 |---|---|---|
-| Graph, aplikacyjne | `User.Read.All` | `EntraIdEmailMembershipNumberMapper`, `EntraIdMemberMailAccountChecker` |
+| Graph, aplikacyjne | `User.Read.All` | `EntraIdMemberMailAccountChecker` |
 | Graph, aplikacyjne | `Sites.Selected` | warunek wstepny dla grantu na site'cie |
 | SharePoint, na site'cie | `write` na `SafeFromHarm-penomocnicychorgwiani` | odczyt "Lista pelnomocnikow", zapis "Zalozone konta" |
 

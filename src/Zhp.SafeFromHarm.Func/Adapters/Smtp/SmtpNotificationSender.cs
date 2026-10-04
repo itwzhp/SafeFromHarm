@@ -16,8 +16,8 @@ internal class SmtpNotificationSender(
     public async Task NotifySupervisor(
         Unit supervisor,
         IEnumerable<MemberToCertify> missingCertificationMembers,
-        IEnumerable<CertifiedMember> certifiedMembers,
-        IEnumerable<CertificationReport.ReportEntry> allCertificationMembersIncludingSubunits)
+        IEnumerable<MemberToCertify> certifiedMembers,
+        IEnumerable<MemberToCertify> allCertificationMembersIncludingSubunits)
     {
         var membersToCertify = missingCertificationMembers.ToList();
         var certifiedMemebersList = certifiedMembers.ToList();
@@ -54,7 +54,7 @@ internal class SmtpNotificationSender(
         await client.SendAsync(mail);
     }
 
-    private static string BuildHtmlContent(List<MemberToCertify> missingCertificationMembers, List<CertifiedMember> certifiedMembers, bool addAttachmentReport)
+    private static string BuildHtmlContent(List<MemberToCertify> missingCertificationMembers, List<MemberToCertify> certifiedMembers, bool addAttachmentReport)
     {
         var b = new StringBuilder("Czuwaj,<br>\n");
 
@@ -89,20 +89,20 @@ internal class SmtpNotificationSender(
         if(certifiedMembers.Count != 0)
         {
             b.AppendLine("""
-                Poniżej znajduje się lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>ukończyli</strong> obowiązkowe szkolenie:
+                Poniżej znajduje się lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>posiadają ważny</strong> certyfikat "Safe From Harm":
                 <ul>
                 """);
 
             var groupedByUnit = certifiedMembers
-                .GroupBy(m => m.Member.AllocationUnitName)
+                .GroupBy(m => m.AllocationUnitName)
                 .OrderBy(g => g.Key);
 
             foreach (var group in groupedByUnit)
             {
                 b.AppendLine($"<li><strong>{group.Key}</strong><ol>");
 
-                foreach (var (member, certificationDate) in group)
-                    b.AppendLine($"<li>   {member.FirstName} {member.LastName} ({member.MembershipNumber}) - {certificationDate:dd.MM.yyyy}</li>");
+                foreach (var member in group)
+                    b.AppendLine($"<li>   {member.FirstName} {member.LastName} ({member.MembershipNumber}) - ważny do {member.CertificateValidUntil:dd.MM.yyyy}</li>");
 
                 b.AppendLine("</ol></li>");
             }
@@ -132,23 +132,23 @@ internal class SmtpNotificationSender(
         return b.ToString();
     }
 
-    private static MemoryStream BuildCsvReport(List<CertificationReport.ReportEntry> allMembers)
+    private static MemoryStream BuildCsvReport(List<MemberToCertify> allMembers)
     {
         const char s = ',';
         var stream = new MemoryStream();
         using (var writter = new StreamWriter(stream, leaveOpen: true, encoding: Encoding.UTF8))
         {
-            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Przydzial{s} Data certyfikatu");
-            foreach (var entry in allMembers)
+            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Przydzial{s} Certyfikat wazny do");
+            foreach (var member in allMembers)
             {
                 writter.WriteLine(string.Join(s,
                     [
-                        entry.Member.FirstName,
-                    entry.Member.LastName,
-                    entry.Member.MembershipNumber,
-                    entry.Member.Supervisor.Name,
-                    entry.Member.AllocationUnitName,
-                    entry.CertificationDate?.ToString("yyyy-MM-dd") ?? "brak"
+                        member.FirstName,
+                        member.LastName,
+                        member.MembershipNumber,
+                        member.Supervisor.Name,
+                        member.AllocationUnitName,
+                        member.CertificateValidUntil?.ToString("yyyy-MM-dd") ?? "brak"
                     ]));
             }
         }
