@@ -74,7 +74,7 @@ internal class SmtpNotificationSender(
                 b.AppendLine($"<li><strong>{group.Key}</strong><ol>");
 
                 foreach (var member in group)
-                    b.AppendLine($"<li>   {member.FirstName} {member.LastName} ({member.MembershipNumber})</li>");
+                    b.AppendLine($"<li>   {member.FirstName} {member.LastName} ({member.MembershipNumber}){DescribeExpiredCertificate(member)}</li>");
 
                 b.AppendLine("</ol></li>");
             }
@@ -133,13 +133,18 @@ internal class SmtpNotificationSender(
         return b.ToString();
     }
 
+    private static string DescribeExpiredCertificate(MemberToCertify member)
+        => member.Status is CertificationStatus.Expired
+            ? $" - certyfikat wygasł {member.CertificateValidUntil:dd.MM.yyyy}"
+            : string.Empty;
+
     private static MemoryStream BuildCsvReport(List<MemberToCertify> allMembers)
     {
         const char s = ',';
         var stream = new MemoryStream();
         using (var writter = new StreamWriter(stream, leaveOpen: true, encoding: Encoding.UTF8))
         {
-            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Przydzial{s} Certyfikat wazny do");
+            writter.WriteLine($"Imie{s} Nazwisko{s} Numer ewidencji{s} Jednostka{s} Przydzial{s} Status{s} Certyfikat wazny do");
             foreach (var member in allMembers)
             {
                 writter.WriteLine(string.Join(s,
@@ -149,7 +154,8 @@ internal class SmtpNotificationSender(
                         member.MembershipNumber,
                         member.Supervisor.Name,
                         member.AllocationUnitName,
-                        member.CertificateValidUntil?.ToString("yyyy-MM-dd") ?? "brak"
+                        SmtpHelper.DescribeStatus(member.Status),
+                        member.CertificateValidUntil?.ToString("yyyy-MM-dd") ?? string.Empty
                     ]));
             }
         }

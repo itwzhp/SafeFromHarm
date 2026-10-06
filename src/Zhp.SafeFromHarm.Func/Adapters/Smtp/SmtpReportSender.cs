@@ -55,10 +55,10 @@ internal class SmtpReportSender(
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, new UTF8Encoding(true), leaveOpen: true);
 
-        writer.WriteLine("Członek,Numer ewidencji,Chorągiew,Hufiec,Certyfikat ważny do,Przydział");
+        writer.WriteLine("Członek,Numer ewidencji,Chorągiew,Hufiec,Status,Certyfikat ważny do,Przydział");
         foreach (var member in members)
         {
-            writer.WriteLine($"{member.FirstName} {member.LastName},{member.MembershipNumber},{member.Department.Name},{member.Supervisor.Name},{member.CertificateValidUntil:yyyy-MM-dd},{member.AllocationUnitName}");
+            writer.WriteLine($"{member.FirstName} {member.LastName},{member.MembershipNumber},{member.Department.Name},{member.Supervisor.Name},{SmtpHelper.DescribeStatus(member.Status)},{member.CertificateValidUntil:yyyy-MM-dd},{member.AllocationUnitName}");
         }
 
         return stream;

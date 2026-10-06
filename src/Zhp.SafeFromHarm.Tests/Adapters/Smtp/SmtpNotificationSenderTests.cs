@@ -10,8 +10,8 @@ namespace Zhp.SafeFromHarm.Tests.Adapters.Smtp;
 
 public class SmtpNotificationSenderTests
 {
-    private static readonly Unit TestHufiec = new(10, "hufiec@zhp.example.com", "Hufiec");
-    private static readonly Unit TestChoragiew = new(11, "choragiew@zhp.example.com", "Chorągiew");
+    private static readonly Unit TestHufiec = new(10, "Hufiec", "hufiec@zhp.example.com");
+    private static readonly Unit TestChoragiew = new(11, "Chorągiew", "choragiew@zhp.example.com");
 
     private readonly SmtpNotificationSender subject;
     private readonly ISmtpClient clientMock = Substitute.For<ISmtpClient>();
@@ -90,6 +90,55 @@ public class SmtpNotificationSenderTests
             .Body.As<MultipartAlternative>();
         sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03) - ważny do 02.12.2023").And.Contain("Drużyna Testowa");
         sentBody.TextBody.Should().Contain("Anna Nowak (AA03) - ważny do 02.12.2023").And.Contain("Drużyna Testowa");
+    }
+
+    [Fact]
+    public async Task MemberWithExpiredCertificate_ContentHasExpirationAnnotation()
+    {
+        await subject.NotifySupervisor(
+            TestHufiec,
+            [
+                new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, TestHufiec.Name, null) { Status = CertificationStatus.None },
+                new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew, TestHufiec.Name, new(2026, 1, 1)) { Status = CertificationStatus.Expired }
+            ],
+            [],
+            []);
+
+        var sentBody = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
+            .Body.As<MultipartAlternative>();
+        sentBody.HtmlBody.Should().Contain("Anna Nowak (AA03) - certyfikat wygasł 01.01.2026").And.Contain("Jan Kowalski (AA02)</li>");
+        sentBody.TextBody.Should().Contain("Anna Nowak (AA03) - certyfikat wygasł 01.01.2026");
+    }
+
+    [Fact]
+    public async Task MembersWithEachStatus_CsvAttachmentDistinguishesExpiredFromMissing()
+    {
+        await subject.NotifySupervisor(
+            TestChoragiew,
+            [],
+            [],
+            [
+                new("Jan", "Kowalski", "AA02", TestHufiec, TestChoragiew, TestHufiec.Name, new(2027, 10, 2)) { Status = CertificationStatus.Valid },
+                new("Anna", "Nowak", "AA03", TestHufiec, TestChoragiew, TestHufiec.Name, new(2026, 1, 1)) { Status = CertificationStatus.Expired },
+                new("Tomasz", "Bezcertyfikatu", "AA04", TestHufiec, TestChoragiew, TestHufiec.Name, null) { Status = CertificationStatus.None }
+            ]);
+
+        var csv = ReadCsvAttachment();
+
+        csv.Should().ContainAll(
+            "Imie, Nazwisko, Numer ewidencji, Jednostka, Przydzial, Status, Certyfikat wazny do",
+            "Jan,Kowalski,AA02,Hufiec,Hufiec,ważny,2027-10-02",
+            "Anna,Nowak,AA03,Hufiec,Hufiec,wygasł,2026-01-01",
+            "Tomasz,Bezcertyfikatu,AA04,Hufiec,Hufiec,brak,");
+    }
+
+    private string ReadCsvAttachment()
+    {
+        var attachment = clientMock.ReceivedCalls().Single().GetArguments().OfType<MimeMessage>().Single()
+            .Attachments.OfType<MimePart>().Single();
+
+        using var reader = new StreamReader(attachment.Content!.Open());
+        return reader.ReadToEnd();
     }
 
     [Fact]

@@ -36,10 +36,10 @@ public class MissingCertificationsNotifierTests
             p => p.As<Unit>().Should().Be(testUnit1),
             p => p.As<IEnumerable<MemberToCertify>>().Should().BeEquivalentTo(new MemberToCertify[]
             {
-                new("Jan", "Kowalski", "AA02", testUnit1, new(15, "Chorągiew 1", "biuro@choragiew1.zhp.pl"), testUnit1.Name, null),
-                new("Anna", "Nowak", "AA03", testUnit1, new(15, "Chorągiew 1", "biuro@choragiew1.zhp.pl"), testUnit1.Name, null)
+                new("Jan", "Kowalski", "AA02", testUnit1, new(15, "Chorągiew 1", "biuro@choragiew1.zhp.pl"), testUnit1.Name, null) { Status = CertificationStatus.None },
+                new("Anna", "Nowak", "AA03", testUnit1, new(15, "Chorągiew 1", "biuro@choragiew1.zhp.pl"), testUnit1.Name, today.AddMonths(-1)) { Status = CertificationStatus.Expired }
             }),
-            p => p.As<IEnumerable<MemberToCertify>>().Should().ContainSingle().Which.Should().Be(new MemberToCertify("Jan", "Kowalski", "AA01", testUnit1, new(15, "Chorągiew 1", "biuro@choragiew1.zhp.pl"), testUnit1.Name, today.AddYears(1))),
+            p => p.As<IEnumerable<MemberToCertify>>().Should().ContainSingle().Which.Should().Be(new MemberToCertify("Jan", "Kowalski", "AA01", testUnit1, new(15, "Chorągiew 1", "biuro@choragiew1.zhp.pl"), testUnit1.Name, today.AddYears(1)) { Status = CertificationStatus.Valid }),
             p => p.As<IEnumerable<MemberToCertify>>().Should().BeEmpty());
 
         senderSubstitute.ReceivedCalls().Single(c => c.GetArguments().First() as Unit == testUnit2).GetArguments().ElementAt(1)
