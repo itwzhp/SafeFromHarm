@@ -61,7 +61,7 @@ internal class SmtpNotificationSender(
         if (missingCertificationMembers.Count != 0)
         {
             b.AppendLine("""
-                Oto lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>nie ukończyli</strong> obowiązkowego szkolenia z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych, a tym samym nie posiadają ważnego certyfikatu "Safe From Harm":
+                Oto lista członków ZHP z przydziałem do Twojej jednostki, którzy <strong>nie ukończyli</strong> obowiązkowego szkolenia z zakresu Polityki ochrony bezpieczeństwa dzieci, młodzieży i dorosłych, a tym samym nie posiadają ważnego certyfikatu "Safe From Harm" lub certyfikat ten stracił ważność:
                 <ul>
                 """);
 
@@ -82,7 +82,8 @@ internal class SmtpNotificationSender(
             b.AppendLine("""
                     </ul>
                     <p>Poproś ich o ukończenie e-szkolenia i wypełnienie testu w <a href="https://edu.zhp.pl/course/view.php?id=47">Harcerskim Serwisie Szkoleniowym</a>.
-                    Jeśli ta informacja jest błędna, wypełnij <a href="https://jira.zhp.pl/plugins/servlet/desk/portal/7/create/208">formularz na helpdesku</a></p>
+                    Certyfikaty są automatycznie dodawane do systemu Tipi, dlatego jeśli ta informacja jest błędna, 
+                    wypełnij <a href="https://jira.zhp.pl/plugins/servlet/desk/portal/7/create/208">formularz na helpdesku</a></p>
                     """);
         }
 
