@@ -1,24 +1,31 @@
 ﻿using Microsoft.Extensions.Logging;
-using Zhp.SafeFromHarm.Domain.Helpers;
+using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 namespace Zhp.SafeFromHarm.Domain.Services;
 
 public class MissingCertificationsNotifier(
     ILogger<MissingCertificationsNotifier> logger,
-    CertificationReportProvider reportProvider,
+    IRequiredMembersFetcher membersFetcher,
     INotificationSender sender,
     ISummarySender summarySender)
 {
     public async Task SendNotificationsOnMissingCertificates(string? onlySendToEmail, CancellationToken cancellationToken)
     {
-        var report = await reportProvider.GetReport(cancellationToken);
+        var members = await membersFetcher.GetMembersRequiredToCertify().ToListAsync(cancellationToken);
+        var report = new CertificationReport(members, DateOnly.FromDateTime(DateTime.Today));
 
-        var notificationsToSend = report.Entries
-            .GroupBy(m => (m.Member.Supervisor, m.Member.Department));
+        logger.LogInformation(
+            "Found {number} members to certify - {certified} certified and {notCertified} not certified",
+            report.NumberToCertify,
+            report.NumberCertified,
+            report.NumberNotCertified);
 
-        var membersPerDepartment = report.Entries
-            .ToLookup(m => m.Member.Department);
+        var notificationsToSend = report.Members
+            .GroupBy(m => (m.Supervisor, m.Department));
+
+        var membersPerDepartment = report.Members
+            .ToLookup(m => m.Department);
 
         var failedRecipients = new List<(string Email, string UnitName)>();
 
@@ -29,10 +36,10 @@ public class MissingCertificationsNotifier(
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var groupedByCert = notification.ToLookup(n => n.CertificationDate.HasValue);
+            var groupedByCert = notification.ToLookup(n => n.IsCertified);
 
-            var missingCertificationMembers = groupedByCert[false].Select(m => m.Member).ToList();
-            var certified = groupedByCert[true].Select(m => new CertifiedMember(m.Member, m.CertificationDate!.Value)).ToList();
+            var missingCertificationMembers = groupedByCert[false].ToList();
+            var certified = groupedByCert[true].ToList();
             
             logger.LogInformation("Sending notification to {supervisor} about {count} missing members and {certCount} certified", notification.Key, missingCertificationMembers.Count, certified.Count);
             try

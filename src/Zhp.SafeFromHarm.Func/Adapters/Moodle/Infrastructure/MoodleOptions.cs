@@ -7,6 +7,4 @@ internal class MoodleOptions
     public string? MoodleHostName { get; set; } = "host.zhp.pl";
 
     public string MoodleToken { get; set; } = string.Empty;
-
-    public int SfhCourseId { get; set; } = 47;
 }

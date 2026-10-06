@@ -4,7 +4,7 @@ namespace Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
 public interface IReportSender
 {
-    Task SendReport(Unit unit, IEnumerable<CertificationReport.ReportEntry> entries);
+    Task SendReport(Unit unit, IEnumerable<MemberToCertify> members);
 
     Task SendCentralReport(CertificationReport report);
 }

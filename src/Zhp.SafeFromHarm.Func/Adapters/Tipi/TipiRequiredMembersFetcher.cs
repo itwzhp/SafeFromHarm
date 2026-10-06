@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Domain.Ports.CertificationNotifications;
 
@@ -51,7 +52,8 @@ internal class TipiRequiredMembersFetcher(
                 entry.memberId,
                 supervisor,
                 department,
-                entry.allocationUnitName);
+                entry.allocationUnitName,
+                entry.certificateValidUntil);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for deserialization")]
@@ -61,6 +63,8 @@ internal class TipiRequiredMembersFetcher(
         string lastName,
         int? hufiecId,
         int? choragiewId,
-        string? allocationUnitName);
+        string? allocationUnitName,
+        // Wymagane, żeby brak pola w odpowiedzi Tipi nie oznaczał po cichu "nikt nie ma certyfikatu"
+        [property: JsonRequired] DateOnly? certificateValidUntil);
 
 }

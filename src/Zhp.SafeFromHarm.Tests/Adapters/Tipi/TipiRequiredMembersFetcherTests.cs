@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Text.Json;
 using Zhp.SafeFromHarm.Domain;
 using Zhp.SafeFromHarm.Domain.Model.CertificationNotifications;
 using Zhp.SafeFromHarm.Func.Adapters.Tipi;
@@ -74,7 +75,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 1111,
                 "memberRoles": "drużynowy",
                 "hufiecId": 2657,
-                "choragiewId": 2031
+                "choragiewId": 2031,
+                "certificateValidUntil": "2027-10-04"
             },
             {
             	"memberId": "AA02",
@@ -86,7 +88,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 6127,
                 "memberRoles": "członek zespołu promocji i informacji hufca",
                 "hufiecId": 6127,
-                "choragiewId": 5967
+                "choragiewId": 5967,
+                "certificateValidUntil": null
             },
             {
         	    "memberId": "AB123",
@@ -98,7 +101,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 5967,
                 "memberRoles": null,
                 "hufiecId": null,
-                "choragiewId": 5967
+                "choragiewId": 5967,
+                "certificateValidUntil": null
             }
         ]
         """;
@@ -113,20 +117,44 @@ public class TipiRequiredMembersFetcherTests
                 "AA01",
                 new(2657, "Hufiec Radomsko", "radomsko@zhp.pl"),
                 new(2031, "Chorągiew Łódzka", "lodzka@zhp.pl"),
-                "10 Jakaś Wodna Drużyna Harcerska"),
+                "10 Jakaś Wodna Drużyna Harcerska",
+                new(2027, 10, 4)),
             new("Anna",
                 "Malinowska",
                 "AA02",
                 new(6127, "Hufiec Ziemi Cieszyńskiej", "cieszyn@zhp.pl"),
                 new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"),
-                "Hufiec Ziemi Cieszyńskiej"),
+                "Hufiec Ziemi Cieszyńskiej",
+                null),
             new("Jan",
                 "Kowalski",
                 "AB123",
                 new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"),
                 new(5967, "Chorągiew Śląska", "choragiew@dolnoslaska.zhp.pl"),
-                "Chorągiew Śląska")
+                "Chorągiew Śląska",
+                null)
         });
+    }
+
+    [Fact]
+    public async Task MissingCertificateValidUntil_Exception()
+    {
+        httpHandler.ResponseBody["/sfh/members-for-training"] = """
+        [
+            {
+                "memberId": "AA01",
+                "firstName": "Jan",
+                "lastName": "Kowalski",
+                "allocationUnitName": "10 Jakaś Wodna Drużyna Harcerska",
+                "hufiecId": 2657,
+                "choragiewId": 2031
+            }
+        ]
+        """;
+        var subject = BuildSubject();
+
+        await subject.Awaiting(s => s.GetMembersRequiredToCertify().ToListAsync())
+            .Should().ThrowAsync<JsonException>();
     }
 
     [Fact]
@@ -144,7 +172,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 20006,
-                "choragiewId": 5967
+                "choragiewId": 5967,
+                "certificateValidUntil": null
             }
         ]
         """;
@@ -170,7 +199,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 20006,
-                "choragiewId": 5967
+                "choragiewId": 5967,
+                "certificateValidUntil": null
             },
             {
         	    "memberId": "BD2",
@@ -182,7 +212,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 6127,
                 "memberRoles": null,
                 "hufiecId": 2657,
-                "choragiewId": 5967
+                "choragiewId": 5967,
+                "certificateValidUntil": null
             }
         ]
         """;
@@ -208,7 +239,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 6127,
                 "memberRoles": "drużynowy",
                 "hufiecId": null,
-                "choragiewId": null
+                "choragiewId": null,
+                "certificateValidUntil": null
             },
             {
             	"memberId": "AA02",
@@ -220,7 +252,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": 6127,
                 "memberRoles": "członek zespołu promocji i informacji hufca",
                 "hufiecId": 6127,
-                "choragiewId": 5967
+                "choragiewId": 5967,
+                "certificateValidUntil": null
             },
             {
             	"memberId": "AA03",
@@ -232,7 +265,8 @@ public class TipiRequiredMembersFetcherTests
                 "allocationUnitId": null,
                 "memberRoles": "drużynowy",
                 "hufiecId": null,
-                "choragiewId": null
+                "choragiewId": null,
+                "certificateValidUntil": null
             }
         ]
         """;

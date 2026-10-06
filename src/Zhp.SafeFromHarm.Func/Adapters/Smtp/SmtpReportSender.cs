@@ -12,9 +12,9 @@ internal class SmtpReportSender(
     IUnitContactMailProvider mailProvider) : IReportSender
 {
     private readonly SmtpOptions options = options.Value;
-    public async Task SendReport(Unit unit, IEnumerable<CertificationReport.ReportEntry> entries)
+    public async Task SendReport(Unit unit, IEnumerable<MemberToCertify> members)
     {
-        var entriesList = entries.ToList();
+        var entriesList = members.ToList();
 
         var client = await clientFactory.GetClient();
 
@@ -50,23 +50,23 @@ internal class SmtpReportSender(
         await client.SendAsync(mail);
     }
 
-    private static MemoryStream BuildReportAttachment(IReadOnlyCollection<CertificationReport.ReportEntry> entries)
+    private static MemoryStream BuildReportAttachment(IReadOnlyCollection<MemberToCertify> members)
     {
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, new UTF8Encoding(true), leaveOpen: true);
 
-        writer.WriteLine("Członek,Numer ewidencji,Chorągiew,Hufiec,Data certyfikacji,Przydział");
-        foreach (var entry in entries)
+        writer.WriteLine("Członek,Numer ewidencji,Chorągiew,Hufiec,Status,Certyfikat ważny do,Przydział");
+        foreach (var member in members)
         {
-            writer.WriteLine($"{entry.Member.FirstName} {entry.Member.LastName},{entry.Member.MembershipNumber},{entry.Member.Department.Name},{entry.Member.Supervisor.Name},{entry.CertificationDate},{entry.Member.AllocationUnitName}");
+            writer.WriteLine($"{member.FirstName} {member.LastName},{member.MembershipNumber},{member.Department.Name},{member.Supervisor.Name},{SmtpHelper.DescribeStatus(member.Status)},{member.CertificateValidUntil:yyyy-MM-dd},{member.AllocationUnitName}");
         }
 
         return stream;
     }
 
-    private static string BuildRegionalHtml(List<CertificationReport.ReportEntry> entries)
+    private static string BuildRegionalHtml(List<MemberToCertify> entries)
     {
-        var totalCertified = entries.Count(e => e.CertificationDate != null);
+        var totalCertified = entries.Count(e => e.IsCertified);
         var total = entries.Count;
         var totalPercentage = (double)totalCertified / total;
 
@@ -77,10 +77,10 @@ internal class SmtpReportSender(
             <ul>
             """);
 
-        foreach (var entry in entries.GroupBy(e => e.Member.Supervisor))
+        foreach (var entry in entries.GroupBy(e => e.Supervisor))
         {
             var entriesForUnit = entry.ToList();
-            var certified = entriesForUnit.Count(e => e.CertificationDate != null);
+            var certified = entriesForUnit.Count(e => e.IsCertified);
             var totalForUnit = entriesForUnit.Count;
             var percentage = (double)certified / totalForUnit;
             builder.AppendLine($"<li>{entry.Key.Name} ({certified}/{totalForUnit}, {percentage:P0})</li>");
@@ -135,19 +135,19 @@ internal class SmtpReportSender(
             <ul>
             """);
 
-        foreach (var department in report.Entries.GroupBy(e => e.Member.Department))
+        foreach (var department in report.Members.GroupBy(e => e.Department))
         {
             var entriesForDepartment = department.ToList();
-            var certified = entriesForDepartment.Count(e => e.CertificationDate != null);
+            var certified = entriesForDepartment.Count(e => e.IsCertified);
             var totalForDepartment = entriesForDepartment.Count;
             var percentage = (double)certified / totalForDepartment;
 
             builder.AppendLine($"<li>{department.Key.Name} ({certified}/{totalForDepartment}, {percentage:P0}), w tym:<ul>");
 
-            foreach (var unit in entriesForDepartment.GroupBy(e => e.Member.Supervisor))
+            foreach (var unit in entriesForDepartment.GroupBy(e => e.Supervisor))
             {
                 var entriesForUnit = unit.ToList();
-                var certifiedForUnit = entriesForUnit.Count(e => e.CertificationDate != null);
+                var certifiedForUnit = entriesForUnit.Count(e => e.IsCertified);
                 var totalForUnit = entriesForUnit.Count;
                 var percentageForUnit = (double)certifiedForUnit / totalForUnit;
 

@@ -13,16 +13,20 @@ internal class DummyRequiredMembersFetcher : IRequiredMembersFetcher
     private readonly Unit choragiew2 = new(16, "Chorągiew 2", "biuro@choragiew2.zhp.pl");
 
     public IAsyncEnumerable<MemberToCertify> GetMembersRequiredToCertify()
-        => new MemberToCertify[]
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        return new MemberToCertify[]
         {
-            new("Jan", "Kowalski", "AA01", hufiec1, choragiew1, hufiec1.Name),
-            new("Jan", "Kowalski", "AA02", hufiec1, choragiew1, hufiec1.Name),
-            new("Tomasz", "Innyhufiec", "AB01", hufiec2, choragiew1, "Drużyna testowa"),
-            new("Anna", "Nowak", "AA03", hufiec1, choragiew1, hufiec1.Name),
+            new("Jan", "Kowalski", "AA01", hufiec1, choragiew1, hufiec1.Name, today.AddYears(1)),
+            new("Jan", "Kowalski", "AA02", hufiec1, choragiew1, hufiec1.Name, null),
+            new("Tomasz", "Innyhufiec", "AB01", hufiec2, choragiew1, "Drużyna testowa", null),
+            new("Anna", "Nowak", "AA03", hufiec1, choragiew1, hufiec1.Name, today.AddMonths(-1)),
 
-            new("Anna", "Malinowska", "AA05", hufiec3, choragiew2, hufiec3.Name),
+            new("Anna", "Malinowska", "AA05", hufiec3, choragiew2, hufiec3.Name, null),
 
-            new("Anna", "Abacka", "AA05", choragiew1, choragiew1, choragiew1.Name),
-            new("Anna", "Cabacka", "AA05", choragiew1, choragiew1, choragiew1.Name),
+            new("Anna", "Abacka", "AA05", choragiew1, choragiew1, choragiew1.Name, null),
+            new("Anna", "Cabacka", "AA05", choragiew1, choragiew1, choragiew1.Name, null),
         }.ToAsyncEnumerable();
+    }
 }

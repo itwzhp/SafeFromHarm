@@ -32,8 +32,7 @@ public static class HostExtensionMethods
             .ConfigureServices((ctx, services) =>
             {
                 services.AddOptions<SafeFromHarmOptions>()
-                    .BindConfiguration("SafeFromHarm")
-                    .Validate(sfh => sfh.CertificateExpiryDays > 0);
+                    .BindConfiguration("SafeFromHarm");
 
                 var adapterToggles = ctx.Configuration.GetSection("Toggles").Get<AdapterTogglesOptions>() ?? new();
                 services
@@ -95,27 +94,10 @@ public static class HostExtensionMethods
     private static IServiceCollection AddCertificationNotifications(this IServiceCollection services, AdapterTogglesOptions toggles)
     {
         services
-            .AddTransient<CertificationReportProvider>()
             .AddTransient<FindMissingRequiredCertifications>()
             .AddTransient<MissingCertificationsNotifier>()
             .AddTransient<ReportGenerator>()
             .AddTransient<GenerateReports>();
-
-        services.AddSwitch("CertifiedMembersFetcher", toggles.CertifiedMembersFetcher, new()
-        {
-            ["Dummy"] = s => s.AddTransient<ICertifiedMembersFetcher, DummyCertifiedMembersFetcher>(),
-            ["Moodle"] = s => s.AddTransient<ICertifiedMembersFetcher, MoodleCertifiedMembersFetcher>(),
-        });
-
-        services.AddSwitch("EmailMembershipNumberMapper", toggles.EmailMembershipNumberMapper, new()
-        {
-            ["Dummy"] = s =>
-                s.AddTransient<IEmailMembershipNumberMapper, DummyEmailMembershipNumberMapper>()
-                    .AddTransient<IUnitContactMailProvider, DummyUnitContactMailProvider>(),
-            ["Ms365"] = s =>
-                s.AddSingleton<IEmailMembershipNumberMapper, EntraIdEmailMembershipNumberMapper>()
-                    .AddSingleton<IUnitContactMailProvider, SharepointUnitContactMailProvider>(),
-        });
 
         services.AddSwitch("RequiredMembersFetcher", toggles.RequiredMembersFetcher, new()
         {
@@ -128,11 +110,13 @@ public static class HostExtensionMethods
             ["Dummy"] = s => s
                         .AddTransient<INotificationSender, DummyNotificationSender>()
                         .AddTransient<ISummarySender, DummySummarySender>()
-                        .AddTransient<IReportSender, DummyReportSender>(),
+                        .AddTransient<IReportSender, DummyReportSender>()
+                        .AddTransient<IUnitContactMailProvider, DummyUnitContactMailProvider>(),
             ["Smtp"] = s => s
                         .AddTransient<INotificationSender, SmtpNotificationSender>()
                         .AddTransient<ISummarySender, SmtpSummarySender>()
-                        .AddTransient<IReportSender, SmtpReportSender>(),
+                        .AddTransient<IReportSender, SmtpReportSender>()
+                        .AddSingleton<IUnitContactMailProvider, SharepointUnitContactMailProvider>(),
         });
 
         return services;

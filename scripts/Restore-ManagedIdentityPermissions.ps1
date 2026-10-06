@@ -7,8 +7,8 @@
     przy usunieciu Function App (bo nowa aplikacja dostaje nowa tozsamosc — nowy objectId i appId):
 
       1. Microsoft Graph, uprawnienie aplikacyjne  User.Read.All   (df021288-bdef-4463-88db-98f22de89214)
-         — EntraIdEmailMembershipNumberMapper / EntraIdMemberMailAccountChecker czytaja liste
-           uzytkownikow z Entra ID (filtr employeeType startsWith 'Tipi').
+         — EntraIdMemberMailAccountChecker sprawdza w Entra ID, czy czlonek (employeeId) ma
+           aktywne konto pocztowe.
 
       2. Microsoft Graph, uprawnienie aplikacyjne  Sites.Selected  (883ea226-0bf2-4a8f-9f9d-92c9162a727d)
          — samo w sobie nie daje dostepu do zadnego site'u; dopiero krok 3 wskazuje ktory.
